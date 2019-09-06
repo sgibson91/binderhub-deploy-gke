@@ -61,9 +61,6 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
   # Check if DOCKER_ORGANISATION is set to null. Return empty string if true.
   if [ x${DOCKER_ORGANISATION} == 'xnull' ] ; then DOCKER_ORGANISATION='' ; fi
 
-  # Azure blue-button prepends '/subscription/' to GCP_PROJECT
-  GCP_PROJECT=$(echo $GCP_PROJECT | sed -r "s/^\/subscriptions\///")
-
 else
 
   # Read in config file and assign variables for the non-container case
