@@ -11,7 +11,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # This script should handle both interactive deployment when run by a user
 # on their local system, and also running as a container entrypoint when
 # used either for a container-based local deployment or when deployed via an
-# Azure blue button setup.
+# Google Cloud Run button setup.
 #
 # Check whether BINDERHUB_CONTAINER_MODE is set, and if so assume running
 # as a container-based install, checking that all required input is present
@@ -61,7 +61,7 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
   # Check if DOCKER_ORGANISATION is set to null. Return empty string if true.
   if [ x${DOCKER_ORGANISATION} == 'xnull' ] ; then DOCKER_ORGANISATION='' ; fi
 
-  # Azure blue-button prepends '/subscription/' to GCP_PROJECT
+  # Prepends '/subscription/' to GCP_PROJECT
   GCP_PROJECT=$(echo $GCP_PROJECT | sed -r "s/^\/subscriptions\///")
 
 else
@@ -153,7 +153,7 @@ set -eo pipefail
 # Generate a valid name for the GKE cluster
 CLUSTER_NAME=`echo ${BINDERHUB_NAME} | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]' | cut -c 1-59`-gke
 
-# Azure login will be different depending on whether this script is running
+# Login will be different depending on whether this script is running
 # with or without service principal details supplied.
 #
 # If all the SP environments are set, use those. Otherwise, fall back to an
