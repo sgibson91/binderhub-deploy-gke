@@ -22,16 +22,13 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
   echo "--> Checking required environment variables"
   # Set out a list of required variables for this script
   REQUIREDVARS=" \
-          SP_APP_ID \
-          SP_APP_KEY \
-          SP_TENANT_ID \
-          RESOURCE_GROUP_NAME \
-          RESOURCE_GROUP_LOCATION \
-          AZURE_SUBSCRIPTION \
+          SERVICE_ACCOUNT \
+          SERVICE_ACCOUNT_KEYFILE \
+          GCP_PROJECT \
           BINDERHUB_NAME \
           BINDERHUB_VERSION \
-          AKS_NODE_COUNT \
-          AKS_NODE_VM_SIZE \
+          NODE_COUNT \
+          NODE_MACHINE_TYPE \
           CONTACT_EMAIL \
           DOCKER_USERNAME \
           DOCKER_PASSWORD \
@@ -46,17 +43,16 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
   done
 
   echo "--> Configuration parsed from blue button:
-    AZURE_SUBSCRIPTION: ${AZURE_SUBSCRIPTION}
+    GCP_PROJECT: ${GCP_PROJECT}
     BINDERHUB_NAME: ${BINDERHUB_NAME}
     BINDERHUB_VERSION: ${BINDERHUB_VERSION}
     CONTACT_EMAIL: ${CONTACT_EMAIL}
-    RESOURCE_GROUP_LOCATION: ${RESOURCE_GROUP_LOCATION}
+    GCP_ZONE: ${GCP_ZONE}
     RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}
-    AKS_NODE_COUNT: ${AKS_NODE_COUNT}
-    AKS_NODE_VM_SIZE: ${AKS_NODE_VM_SIZE}
-    SP_APP_ID: ${SP_APP_ID}
-    SP_APP_KEY: ${SP_APP_KEY}
-    SP_TENANT_ID: ${SP_TENANT_ID}
+    NODE_COUNT: ${NODE_COUNT}
+    MACHINE_TYPE: ${MACHINE_TYPE}
+    SERVICE_ACCOUNT: ${SERVICE_ACCOUNT}
+    SERVICE_ACCOUNT_KEYFILE: ${SERVICE_ACCOUNT_KEYFILE}
     DOCKER_USERNAME: ${DOCKER_USERNAME}
     DOCKER_IMAGE_PREFIX: ${DOCKER_IMAGE_PREFIX}
     DOCKER_ORGANISATION: ${DOCKER_ORGANISATION}
@@ -65,8 +61,8 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
   # Check if DOCKER_ORGANISATION is set to null. Return empty string if true.
   if [ x${DOCKER_ORGANISATION} == 'xnull' ] ; then DOCKER_ORGANISATION='' ; fi
 
-  # Azure blue-button prepends '/subscription/' to AZURE_SUBSCRIPTION
-  AZURE_SUBSCRIPTION=$(echo $AZURE_SUBSCRIPTION | sed -r "s/^\/subscriptions\///")
+  # Azure blue-button prepends '/subscription/' to GCP_PROJECT
+  GCP_PROJECT=$(echo $GCP_PROJECT | sed -r "s/^\/subscriptions\///")
 
 else
 
@@ -75,17 +71,15 @@ else
 
   echo "--> Reading configuration from ${configFile}"
 
-  AZURE_SUBSCRIPTION=`jq -r '.azure .subscription' ${configFile}`
   BINDERHUB_NAME=`jq -r '.binderhub .name' ${configFile}`
   BINDERHUB_VERSION=`jq -r '.binderhub .version' ${configFile}`
   CONTACT_EMAIL=`jq -r '.binderhub .contact_email' ${configFile}`
-  RESOURCE_GROUP_LOCATION=`jq -r '.azure .location' ${configFile}`
-  RESOURCE_GROUP_NAME=`jq -r '.azure .res_grp_name' ${configFile}`
-  AKS_NODE_COUNT=`jq -r '.azure .node_count' ${configFile}`
-  AKS_NODE_VM_SIZE=`jq -r '.azure .vm_size' ${configFile}`
-  SP_APP_ID=`jq -r '.azure .sp_app_id' ${configFile}`
-  SP_APP_KEY=`jq -r '.azure .sp_app_key' ${configFile}`
-  SP_TENANT_ID=`jq -r '.azure .sp_tenant_id' ${configFile}`
+  GCP_PROJECT=`jq -r '.gcloud .project' ${configFile}`
+  GCP_ZONE=`jq -r '.gcloud .zone' ${configFile}`
+  NODE_COUNT=`jq -r '.gcloud .node_count' ${configFile}`
+  MACHINE_TYPE=`jq -r '.gcloud .machine_type' ${configFile}`
+  SERVICE_ACCOUNT=`jq -r '.gcloud .service_account' ${configFile}`
+  SERVICE_ACCOUNT_KEYFILE=`jq -r '.gcloud .key_file' ${configFile}`
   DOCKER_USERNAME=`jq -r '.docker .username' ${configFile}`
   DOCKER_PASSWORD=`jq -r '.docker .password' ${configFile}`
   DOCKER_IMAGE_PREFIX=`jq -r '.docker .image_prefix' ${configFile}`
@@ -93,18 +87,17 @@ else
 
   # Check that the variables are all set non-zero, non-null
   REQUIREDVARS=" \
-          RESOURCE_GROUP_NAME \
-          RESOURCE_GROUP_LOCATION \
-          AZURE_SUBSCRIPTION \
+          GCP_ZONE \
+          GCP_PROJECT \
           BINDERHUB_NAME \
           BINDERHUB_VERSION \
-          AKS_NODE_COUNT \
-          AKS_NODE_VM_SIZE \
+          NODE_COUNT \
+          MACHINE_TYPE \
           CONTACT_EMAIL \
           DOCKER_IMAGE_PREFIX \
           "
   for required_var in $REQUIREDVARS ; do
-    if [ -z "${!required_var}" ] || [ x${required_var} == 'xnull' ] ; then
+    if [ -z "${!required_var}" ] || [ x${!required_var} == 'xnull' ] ; then
       echo "--> ${required_var} must be set for deployment" >&2
       exit 1
     fi
@@ -115,28 +108,25 @@ else
   # possibly due to an invalid json file, they will be returned as a
   # zero-length string -- this is attempting to make the 'not set'
   # value the same in either case.
-  if [ x${SP_APP_ID} == 'xnull' ] ; then SP_APP_ID='' ; fi
-  if [ x${SP_APP_KEY} == 'xnull' ] ; then SP_APP_KEY='' ; fi
-  if [ x${SP_TENANT_ID} == 'xnull' ] ; then SP_TENANT_ID='' ; fi
+  if [ x${SERVICE_ACCOUNT} == 'xnull' ] ; then SERVICE_ACCOUNT='' ; fi
+  if [ x${SERVICE_ACCOUNT_KEYFILE} == 'xnull' ] ; then SERVICE_ACCOUNT_KEYFILE='' ; fi
   if [ x${DOCKER_USERNAME} == 'xnull' ] ; then DOCKER_USERNAME='' ; fi
   if [ x${DOCKER_PASSWORD} == 'xnull' ] ; then DOCKER_PASSWORD='' ; fi
   if [ x${DOCKER_ORGANISATION} == 'xnull' ] ; then DOCKER_ORGANISATION='' ; fi
 
   # Normalise resource group location to remove spaces and have lowercase
-  RESOURCE_GROUP_LOCATION=`echo ${RESOURCE_GROUP_LOCATION//[[:blank:]]/} | tr '[:upper:]' '[:lower:]'`
+  GCP_ZONE=`echo ${GCP_ZONE//[[:blank:]]/} | tr '[:upper:]' '[:lower:]'`
 
   echo "--> Configuration read in:
-    AZURE_SUBSCRIPTION: ${AZURE_SUBSCRIPTION}
+    GCP_PROJECT: ${GCP_PROJECT}
     BINDERHUB_NAME: ${BINDERHUB_NAME}
     BINDERHUB_VERSION: ${BINDERHUB_VERSION}
     CONTACT_EMAIL: ${CONTACT_EMAIL}
-    RESOURCE_GROUP_LOCATION: ${RESOURCE_GROUP_LOCATION}
-    RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}
-    AKS_NODE_COUNT: ${AKS_NODE_COUNT}
-    AKS_NODE_VM_SIZE: ${AKS_NODE_VM_SIZE}
-    SP_APP_ID: ${SP_APP_ID}
-    SP_APP_KEY: ${SP_APP_KEY}
-    SP_TENANT_ID: ${SP_TENANT_ID}
+    GCP_ZONE: ${GCP_ZONE}
+    NODE_COUNT: ${NODE_COUNT}
+    MACHINE_TYPE: ${MACHINE_TYPE}
+    SERVICE_ACCOUNT: ${SERVICE_ACCOUNT}
+    SERVICE_ACCOUNT_KEYFILE: ${SERVICE_ACCOUNT_KEYFILE}
     DOCKER_USERNAME: ${DOCKER_USERNAME}
     DOCKER_IMAGE_PREFIX: ${DOCKER_IMAGE_PREFIX}
     DOCKER_ORGANISATION: ${DOCKER_ORGANISATION}
@@ -160,8 +150,8 @@ fi
 
 set -eo pipefail
 
-# Generate a valid name for the AKS cluster
-AKS_NAME=`echo ${BINDERHUB_NAME} | tr -cd '[:alnum:]-' | cut -c 1-59`-AKS
+# Generate a valid name for the GKE cluster
+CLUSTER_NAME=`echo ${BINDERHUB_NAME} | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]' | cut -c 1-59`-gke
 
 # Azure login will be different depending on whether this script is running
 # with or without service principal details supplied.
@@ -169,54 +159,53 @@ AKS_NAME=`echo ${BINDERHUB_NAME} | tr -cd '[:alnum:]-' | cut -c 1-59`-AKS
 # If all the SP environments are set, use those. Otherwise, fall back to an
 # interactive login.
 
-if [ -z $SP_APP_ID ] || [ -z $SP_APP_KEY ] || [ -z $SP_TENANT_ID ] ; then
-  echo "--> Attempting to log in to Azure as a user"
-  if ! az login -o none; then
-      echo "--> Unable to connect to Azure" >&2
-      exit 1
-  else
-      echo "--> Logged in to Azure"
+GCLOUD="gcloud --project=${GCP_PROJECT}"
+
+if [ -z $SERVICE_ACCOUNT_KEYFILE ] || [ -z $SERVICE_ACCOUNT ] ; then
+
+  an_account_exists=$(gcloud auth list --format json | jq '.[0].account')
+  if [ "x${an_account_exists}" = "xnull" ]; then
+    echo "--> Attempting to log in to Google Cloud"
+    if ! gcloud auth login; then
+        echo "--> Unable to connect to Google Cloud" >&2
+        exit 1
+    else
+        echo "--> Logged in to Google Cloud"
+    fi
   fi
 else
-  echo "--> Attempting to log in to Azure with service principal ${SP_APP_ID}"
-  if ! az login --service-principal -u "${SP_APP_ID}" -p "${SP_APP_KEY}" -t "${SP_TENANT_ID}"; then
-    echo "--> Unable to connect to Azure" >&2
+  echo "--> Attempting to log in to Google Cloud with service account ${SERVICE_ACCOUNT} (${SERVICE_ACCOUNT_KEYFILE})"
+  if ! gcloud auth activate-service-account --key-file "${SERVICE_ACCOUNT_KEYFILE}"; then
+    echo "--> Unable to connect to Google" >&2
     exit 1
   else
-      echo "--> Logged in to Azure"
+      echo "--> Logged in to Google Cloud"
       # Use this service principal for AKS creation
-      AKS_SP="--service-principal ${SP_APP_ID} --client-secret ${SP_APP_KEY}"
+      SA="--account ${SERVICE_ACCOUNT}"
   fi
 fi
 
 # Activate chosen subscription
-echo "--> Activating Azure subscription: ${AZURE_SUBSCRIPTION}"
-az account set -s "$AZURE_SUBSCRIPTION"
-
-# Create a new resource group if necessary
-echo "--> Checking if resource group exists: ${RESOURCE_GROUP_NAME}"
-if [[ $(az group exists --name $RESOURCE_GROUP_NAME) == false ]] ; then
-  echo "--> Creating new resource group: ${RESOURCE_GROUP_NAME}"
-  az group create -n $RESOURCE_GROUP_NAME --location $RESOURCE_GROUP_LOCATION -o table | tee rg-create.log
-else
-  echo "--> Resource group ${RESOURCE_GROUP_NAME} found."
+if [ ! -z "${SERVICE_ACCOUNT}" ]; then
+  echo "--> Activating Service Account: ${SERVICE_ACCOUNT}"
+  GCLOUD="${GCLOUD} ${SA}"
 fi
 
 # Create an AKS cluster
 echo "--> Creating AKS cluster; this may take a few minutes to complete
-Resource Group: ${RESOURCE_GROUP_NAME}
-Cluster name:   ${AKS_NAME}
-Node count:     ${AKS_NODE_COUNT}
-Node VM size:   ${AKS_NODE_VM_SIZE}"
-az aks create -n $AKS_NAME -g $RESOURCE_GROUP_NAME --generate-ssh-keys --node-count $AKS_NODE_COUNT --node-vm-size $AKS_NODE_VM_SIZE -o table ${AKS_SP} | tee aks-create.log
-
-# Get kubectl credentials from Azure
-echo "--> Fetching kubectl credentials from Azure"
-az aks get-credentials -n $AKS_NAME -g $RESOURCE_GROUP_NAME -o table | tee get-credentials.log
+Cluster name:   ${CLUSTER_NAME}
+Node count:     ${NODE_COUNT}
+Node VM size:   ${MACHINE_TYPE}"
+$GCLOUD container clusters create \
+  --machine-type ${MACHINE_TYPE} \
+  --num-nodes ${NODE_COUNT} \
+  --zone ${GCP_ZONE} \
+  --cluster-version latest \
+  "${CLUSTER_NAME}"
 
 # Check nodes are ready
 nodecount="$(kubectl get node | awk '{print $2}' | grep Ready | wc -l)"
-while [[ ${nodecount} -ne ${AKS_NODE_COUNT} ]] ; do echo -n $(date) ; echo " : ${nodecount} of ${AKS_NODE_COUNT} nodes ready" ; sleep 15 ; nodecount="$(kubectl get node | awk '{print $2}' | grep Ready | wc -l)" ; done
+while [[ ${nodecount} -ne ${NODE_COUNT} ]] ; do echo -n $(date) ; echo " : ${nodecount} of ${NODE_COUNT} nodes ready" ; sleep 15 ; nodecount="$(kubectl get node | awk '{print $2}' | grep Ready | wc -l)" ; done
 echo
 echo "--> Cluster node status:"
 kubectl get node | tee kubectl-status.log
@@ -345,34 +334,3 @@ do
     BINDER_IP=`kubectl --namespace=$HELM_BINDERHUB_NAME get svc binder | awk '{ print $4}' | tail -n 1`
     echo "Binder IP: ${BINDER_IP}" | tee binder-ip.log
 done
-
-if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
-  # Finally, save outputs to blob storage
-  #
-  # Create a storage account
-  echo "--> Creating storage account"
-  CONTAINER_NAME="${BINDERHUB_NAME}deploylogs"
-  STORAGE_ACCOUNT_NAME="$(echo ${BINDERHUB_NAME} | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]' | cut -c -20)$(openssl rand -hex 2)"
-  az storage account create \
-    --name ${STORAGE_ACCOUNT_NAME} --resource-group ${RESOURCE_GROUP_NAME} \
-    --sku Standard_LRS -o table | tee storage-create.log
-  # Create a container
-  echo "--> Creating storage container: ${CONTAINER_NAME}"
-  az storage container create --account-name ${STORAGE_ACCOUNT_NAME} \
-    --name ${CONTAINER_NAME} | tee container-create.log
-  # Push the files
-  echo "--> Pushing log files"
-  az storage blob upload-batch --account-name ${STORAGE_ACCOUNT_NAME} \
-    --destination ${CONTAINER_NAME} --source "." \
-    --pattern "*.log"
-  echo "--> Pushing yaml files"
-  az storage blob upload-batch --account-name ${STORAGE_ACCOUNT_NAME} \
-    --destination ${CONTAINER_NAME} --source "." \
-    --pattern "*.yaml"
-  echo "--> Getting and pushing ssh keys"
-  cp ~/.ssh/id_rsa ${DIR}/id_rsa_${BINDERHUB_NAME}
-  cp ~/.ssh/id_rsa.pub ${DIR}/id_rsa_${BINDERHUB_NAME}.pub
-  az storage blob upload-batch --account-name ${STORAGE_ACCOUNT_NAME} \
-    --destination ${CONTAINER_NAME} --source "." \
-    --pattern "id*"
-fi
