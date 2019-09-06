@@ -29,7 +29,6 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
           BINDERHUB_VERSION \
           NODE_COUNT \
           NODE_MACHINE_TYPE \
-          CONTACT_EMAIL \
           DOCKER_USERNAME \
           DOCKER_PASSWORD \
           DOCKER_IMAGE_PREFIX \
@@ -46,7 +45,6 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
     GCP_PROJECT: ${GCP_PROJECT}
     BINDERHUB_NAME: ${BINDERHUB_NAME}
     BINDERHUB_VERSION: ${BINDERHUB_VERSION}
-    CONTACT_EMAIL: ${CONTACT_EMAIL}
     GCP_ZONE: ${GCP_ZONE}
     RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}
     NODE_COUNT: ${NODE_COUNT}
@@ -73,7 +71,6 @@ else
 
   BINDERHUB_NAME=`jq -r '.binderhub .name' ${configFile}`
   BINDERHUB_VERSION=`jq -r '.binderhub .version' ${configFile}`
-  CONTACT_EMAIL=`jq -r '.binderhub .contact_email' ${configFile}`
   GCP_PROJECT=`jq -r '.gcloud .project' ${configFile}`
   GCP_ZONE=`jq -r '.gcloud .zone' ${configFile}`
   NODE_COUNT=`jq -r '.gcloud .node_count' ${configFile}`
@@ -93,7 +90,6 @@ else
           BINDERHUB_VERSION \
           NODE_COUNT \
           MACHINE_TYPE \
-          CONTACT_EMAIL \
           DOCKER_IMAGE_PREFIX \
           "
   for required_var in $REQUIREDVARS ; do
@@ -121,7 +117,6 @@ else
     GCP_PROJECT: ${GCP_PROJECT}
     BINDERHUB_NAME: ${BINDERHUB_NAME}
     BINDERHUB_VERSION: ${BINDERHUB_VERSION}
-    CONTACT_EMAIL: ${CONTACT_EMAIL}
     GCP_ZONE: ${GCP_ZONE}
     NODE_COUNT: ${NODE_COUNT}
     MACHINE_TYPE: ${MACHINE_TYPE}
