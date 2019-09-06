@@ -11,7 +11,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # This script should handle both interactive deployment when run by a user
 # on their local system, and also running as a container entrypoint when
 # used either for a container-based local deployment or when deployed via an
-# Azure blue button setup.
+# Google Cloud Run button setup.
 #
 # Check whether BINDERHUB_CONTAINER_MODE is set, and if so assume running
 # as a container-based install, checking that all required input is present
@@ -29,7 +29,6 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
           BINDERHUB_VERSION \
           NODE_COUNT \
           NODE_MACHINE_TYPE \
-          CONTACT_EMAIL \
           DOCKER_USERNAME \
           DOCKER_PASSWORD \
           DOCKER_IMAGE_PREFIX \
@@ -46,7 +45,6 @@ if [ ! -z $BINDERHUB_CONTAINER_MODE ] ; then
     GCP_PROJECT: ${GCP_PROJECT}
     BINDERHUB_NAME: ${BINDERHUB_NAME}
     BINDERHUB_VERSION: ${BINDERHUB_VERSION}
-    CONTACT_EMAIL: ${CONTACT_EMAIL}
     GCP_ZONE: ${GCP_ZONE}
     RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}
     NODE_COUNT: ${NODE_COUNT}
@@ -70,7 +68,6 @@ else
 
   BINDERHUB_NAME=`jq -r '.binderhub .name' ${configFile}`
   BINDERHUB_VERSION=`jq -r '.binderhub .version' ${configFile}`
-  CONTACT_EMAIL=`jq -r '.binderhub .contact_email' ${configFile}`
   GCP_PROJECT=`jq -r '.gcloud .project' ${configFile}`
   GCP_ZONE=`jq -r '.gcloud .zone' ${configFile}`
   NODE_COUNT=`jq -r '.gcloud .node_count' ${configFile}`
@@ -90,7 +87,6 @@ else
           BINDERHUB_VERSION \
           NODE_COUNT \
           MACHINE_TYPE \
-          CONTACT_EMAIL \
           DOCKER_IMAGE_PREFIX \
           "
   for required_var in $REQUIREDVARS ; do
@@ -118,7 +114,6 @@ else
     GCP_PROJECT: ${GCP_PROJECT}
     BINDERHUB_NAME: ${BINDERHUB_NAME}
     BINDERHUB_VERSION: ${BINDERHUB_VERSION}
-    CONTACT_EMAIL: ${CONTACT_EMAIL}
     GCP_ZONE: ${GCP_ZONE}
     NODE_COUNT: ${NODE_COUNT}
     MACHINE_TYPE: ${MACHINE_TYPE}
@@ -150,7 +145,7 @@ set -eo pipefail
 # Generate a valid name for the GKE cluster
 CLUSTER_NAME=`echo ${BINDERHUB_NAME} | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]' | cut -c 1-59`-gke
 
-# Azure login will be different depending on whether this script is running
+# Login will be different depending on whether this script is running
 # with or without service principal details supplied.
 #
 # If all the SP environments are set, use those. Otherwise, fall back to an
