@@ -146,7 +146,7 @@ set -eo pipefail
 CLUSTER_NAME=`echo ${BINDERHUB_NAME} | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]' | cut -c 1-59`-gke
 
 # Login will be different depending on whether this script is running
-# with or without service principal details supplied.
+# with or without service account details supplied.
 #
 # If all the SP environments are set, use those. Otherwise, fall back to an
 # interactive login.
@@ -172,7 +172,7 @@ else
     exit 1
   else
       echo "--> Logged in to Google Cloud"
-      # Use this service principal for AKS creation
+      # Use this service account for cluster creation
       SA="--account ${SERVICE_ACCOUNT}"
   fi
 fi
@@ -183,8 +183,8 @@ if [ ! -z "${SERVICE_ACCOUNT}" ]; then
   GCLOUD="${GCLOUD} ${SA}"
 fi
 
-# Create an AKS cluster
-echo "--> Creating AKS cluster; this may take a few minutes to complete
+# Create a cluster
+echo "--> Creating cluster; this may take a few minutes to complete
 Cluster name:   ${CLUSTER_NAME}
 Node count:     ${NODE_COUNT}
 Node VM size:   ${MACHINE_TYPE}"
@@ -223,7 +223,7 @@ kubectl patch deployment tiller-deploy --namespace=kube-system --type=json --pat
 tillerStatus="$(kubectl get pods --namespace kube-system | grep ^tiller | awk '{print $3}')"
 while [[ ! x${tillerStatus} == xRunning ]] ; do echo -n $(date) ; echo " : tiller pod status : ${tillerStatus} " ; sleep 30 ; tillerStatus="$(kubectl get pods --namespace kube-system | grep ^tiller | awk '{print $3}')" ; done
 echo
-echo "--> AKS system pods status:"
+echo "--> System pods status:"
 kubectl get pods --namespace kube-system | tee kubectl-get-pods.log
 echo
 
