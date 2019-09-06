@@ -64,10 +64,10 @@ You need to create a file called `config.json` which has the format described in
 Fill the quotation marks with your desired namespaces, etc.
 `config.json` is git-ignored so sensitive information, such as passwords and Service Principals, cannot not be pushed to GitHub.
 
-* For a list of available data centre regions, [see here](https://azure.microsoft.com/en-us/global-infrastructure/locations/).
+* For a list of available data centre regions, [see here](https://cloud.google.com/compute/docs/regions-zones/viewing-regions-zones).
   This should be a _region_ and **not** a _location_, for example "West Europe" or "Central US".
   These can be equivalently written as `westeurope` and `centralus`, respectively.
-* For a list of available Linux Virtual Machines, [see here](https://docs.microsoft.com/en-gb/azure/virtual-machines/linux/sizes-general).
+* For a list of available Linux Virtual Machines, [see here](https://cloud.google.com/compute/docs/machine-types).
   This should be something like, for example `Standard_D2s_v3`.
 * The versions of the BinderHub Helm Chart can be found [here](https://jupyterhub.github.io/helm-chart/#development-releases-binderhub) and are of the form `0.2.0-<commit-hash>`.
   It is advised to select the most recent version unless you specifically require an older one.
