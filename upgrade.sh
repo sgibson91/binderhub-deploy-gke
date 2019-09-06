@@ -6,14 +6,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # Read in config.json and get variables
 echo "--> Reading in config.json"
 configFile="${DIR}/config.json"
-AKS_RESOURCE_GROUP=`jq -r '.azure .res_grp_name' ${configFile}`
 BINDERHUB_NAME=`jq -r '.binderhub .name' ${configFile}`
 BINDERHUB_VERSION=`jq -r '.binderhub .version' ${configFile}`
-AKS_NAME=`echo ${BINDERHUB_NAME}-AKS`
-
-# Get cluster credentials
-echo "--> Getting credentials for AKS cluster"
-az aks get-credentials -n $AKS_NAME -g $AKS_RESOURCE_GROUP
 
 # Initialise helm
 echo "--> Initialising helm"
