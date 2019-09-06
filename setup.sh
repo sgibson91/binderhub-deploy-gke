@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+set -ex
 
 # Check sudo availability
-sudo_command=`command -v sudo`
+sudo_command=`command -v sudo || echo ''`
 
 ## Linux install cases
 if [[ ${OSTYPE} == 'linux'* ]] ; then
@@ -10,6 +11,7 @@ if [[ ${OSTYPE} == 'linux'* ]] ; then
   if command -v apt >/dev/null 2>&1 ; then
     echo "--> Checking system packages and installing any missing packages"
     # Update apt before starting, in case this is a new container
+    ${sudo_command} apt update
     APTPACKAGES=" \
       curl \
       python \
@@ -19,12 +21,15 @@ if [[ ${OSTYPE} == 'linux'* ]] ; then
     for package in $APTPACKAGES ; do
       if ! dpkg -s $package > /dev/null ; then
         echo "--> Apt installing $package"
-        ${sudo_command} apt update && ${sudo_command} apt install -y $package || { echo >&2 "--> $package install failed; please install manually and re-run this script."; exit 1; }
+        ${sudo_command} apt install -y $package || { echo >&2 "--> $package install failed; please install manually and re-run this script."; exit 1; }
 	fi
     done
     if ! command -v az >/dev/null 2>&1 ; then
-      echo "--> Attempting to install Azure-CLI with deb packages"
-      curl -sL https://aka.ms/InstallAzureCLIDeb | ${sudo_command} bash || { echo >&2 "--> Azure-CLI install failed; please install manually and re-run this script."; exit 1; }
+      echo "--> Attempting to install Google Cloud SDK with deb packages"
+      echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | ${sudo_command} tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+      ${sudo_command} apt-get -y install apt-transport-https ca-certificates gnupg
+      curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | ${sudo_command} apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+      ${sudo_command} apt-get update && ${sudo_command} apt-get -y install google-cloud-sdk
     fi
     if ! command -v kubectl >/dev/null 2>&1 ; then
       echo "--> Attempting to install kubectl with deb packages"
@@ -64,10 +69,18 @@ if [[ ${OSTYPE} == 'linux'* ]] ; then
       fi
     done
     if ! command -v az >/dev/null 2>&1 ; then
-      echo "--> Attempting to install Azure-CLI with yum packages"
-      ${sudo_command} rpm --import https://packages.microsoft.com/keys/microsoft.asc
-      ${sudo_command} sh -c 'echo -e "[azure-cli]\nname=Azure CLI\nbaseurl=https://packages.microsoft.com/yumrepos/azure-cli\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/azure-cli.repo'
-      ${sudo_command} yum install -y azure-cli || { echo >&2 "--> Azure-CLI install failed; please install manually and re-run this script."; exit 1; }
+      echo "--> Attempting to install Google Cloud SDK with yum packages"
+      ${sudo_command} tee -a /etc/yum.repos.d/google-cloud-sdk.repo << EOM
+[google-cloud-sdk]
+name=Google Cloud SDK
+baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+       https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOM
+      ${sudo_command} yum install -y google-cloud-sdk
     fi
     if ! command -v kubectl >/dev/null 2>&1 ; then
       echo "--> Attempting to install kubectl with yum packages"
@@ -100,12 +113,8 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 	fi
     done
     if ! command -v az >/dev/null 2>&1 ; then
-      echo "--> Attempting to install Azure-CLI with zypper packages"
-      ${sudo_command} rpm --import https://packages.microsoft.com/keys/microsoft.asc
-      ${sudo_command} zypper addrepo --name 'Azure CLI' --check https://packages.microsoft.com/yumrepos/azure-cli azure-cli
-      ${sudo_command} zypper install --from azure-cli -y azure-cli || { echo >&2 "--> azure-cli install failed; please install manually and re-run this script."; exit 1; }
-      # The az-cli installer misses python-xml dependency on suse
-      ${sudo_command} zypper install -y python-xml || { echo >&2 "--> python-xml install failed; please install manually and re-run this script."; exit 1; }
+      echo "--> Attempting to install Google Cloud SDK with zypper packages"
+      ${sudo_command} zypper install -y google-cloud-sdk || { echo >&2 "--> azure-cli install failed; please install manually and re-run this script."; exit 1; }
     fi
     if ! command -v kubectl >/dev/null 2>&1 ; then
       echo "--> Attempting to install kubectl with zypper packages"
@@ -132,11 +141,13 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
       if ! pacman -Q $package 2> /dev/null ; then
         echo "--> pacman installing $package"
         ${sudo_command} pacman -Sy --noconfirm $package || { echo >&2 "--> $package install failed; please install manually and re-run this script."; exit 1; }
-	fi
+	    fi
     done
-    if ! command -v az >/dev/null 2>&1 ; then
-      echo "--> Attempting to install Azure-CLI with curl"
-      curl -L https://aka.ms/InstallAzureCli | sh || { echo >&2 "--> Azure-CLI install failed; please install manually and re-run this script."; exit 1; }
+    echo "--> Attempting to install Google Cloud SDK with curl"
+    if ! command -v gcloud >/dev/null 2>&1  ; then
+      curl -LO https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+      tar -xzf google-cloud-sdk.tar.gz
+      ./google-cloud-sdk/install.sh || { echo >&2 "--> Google Cloud SDK install failed; please install manually and re-run this script."; exit 1; }
     fi
 
 ## Mystery linux system without any of our recognised package managers
@@ -146,9 +157,11 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
     command -v grep >/dev/null 2>&1 || { echo >&2 "grep not found; please install and re-run this script."; exit 1; }
     command -v python >/dev/null 2>&1 || { echo >&2 "python not found; please install and re-run this script."; exit 1; }
     command -v jq >/dev/null 2>&1 || { echo >&2 "jq not found; please install and re-run this script."; exit 1; }
-    echo "--> Attempting to install Azure-CLI with curl"
-    if ! command -v az >/dev/null 2>&1 ; then
-      curl -L https://aka.ms/InstallAzureCli | sh || { echo >&2 "--> Azure-CLI install failed; please install manually and re-run this script."; exit 1; }
+    echo "--> Attempting to install Google Cloud SDK with curl"
+    if ! command -v gcloud >/dev/null 2>&1  ; then
+      curl -LO https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+      tar -xzf google-cloud-sdk.tar.gz
+      ./google-cloud-sdk/install.sh || { echo >&2 "--> Google Cloud SDK install failed; please install manually and re-run this script."; exit 1; }
     fi
     echo "--> Attempting to install kubectl with curl"
     if ! command -v kubectl >/dev/null 2>&1 ; then
@@ -179,25 +192,36 @@ elif [[ ${OSTYPE} == 'darwin'* ]] ; then
     BREWPACKAGES=" \
       curl \
       python \
-      azure-cli \
       kubernetes-cli \
       kubernetes-helm \
       jq \
       "
+    BREWCASKS=" \
+      google-cloud-sdk \
+      "
+    brew update
     for package in $BREWPACKAGES ; do
       if ! brew ls --versions $package > /dev/null ; then
         echo "--> Brew installing $package"
-        brew update && brew install $package || { echo >&2 "--> $package install failed; please install manually and re-run this script."; exit 1; }
-	fi
+         brew install $package || { echo >&2 "--> $package install failed; please install manually and re-run this script."; exit 1; }
+	    fi
+    done
+    for package in $BREWCASKS ; do
+      if ! brew cask ls --versions $package > /dev/null ; then
+        echo "--> Brew installing $package"
+         brew cask install $package || { echo >&2 "--> $package install failed; please install manually and re-run this script."; exit 1; }
+      fi
     done
   else
     command -v curl >/dev/null 2>&1 || { echo >&2 "curl not found; please install and re-run this script."; exit 1; }
     command -v python >/dev/null 2>&1 || { echo >&2 "python not found; please install and re-run this script."; exit 1; }
     command -v tar >/dev/null 2>&1 || { echo >&2 "tar not found; please install and re-run this script."; exit 1; }
     command -v which >/dev/null 2>&1 || { echo >&2 "which not found; please install and re-run this script."; exit 1; }
-    echo "--> Attempting to install Azure-CLI with curl"
-    if ! command -v az >/dev/null 2>&1  ; then
-      curl -L https://aka.ms/InstallAzureCli | sh || { echo >&2 "--> Azure-CLI install failed; please install manually and re-run this script."; exit 1; }
+    echo "--> Attempting to install Google Cloud SDK with curl"
+    if ! command -v gcloud >/dev/null 2>&1  ; then
+      curl -LO https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+      tar -xzf google-cloud-sdk.tar.gz
+      ./google-cloud-sdk/install.sh || { echo >&2 "--> Google Cloud SDK install failed; please install manually and re-run this script."; exit 1; }
     fi
     echo "--> Attempting to install kubectl with curl"
     if ! command -v kubectl >/dev/null 2>&1 ; then
@@ -207,7 +231,7 @@ elif [[ ${OSTYPE} == 'darwin'* ]] ; then
     fi
     echo "--> Attempting to install helm with curl"
     if ! command -v helm >/dev/null 2>&1 ; then
-      curl https://raw.githubusercontent.com/helm/helm/master/scripts/get > get_helm.sh
+      curl -L https://raw.githubusercontent.com/helm/helm/master/scripts/get > get_helm.sh
       chmod 700 get_helm.sh
       ./get_helm.sh || { echo >&2 "--> helm install failed; please install manually and re-run this script."; exit 1; }
     fi
