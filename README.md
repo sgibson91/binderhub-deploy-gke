@@ -349,3 +349,4 @@ We would like to acknowledge and thank the following people for their contributi
 * Gerard Gorman ([@ggorman](https://github.com/ggorman))
 * Tania Allard ([@trallard](https://github.com/trallard))
 * Diego Alonso Alvarez ([@dalonsoa](https://github.com/dalonsoa))
+* Min Ragan-Kelley ([@minrk](https://github.com/minrk))
