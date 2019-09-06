@@ -51,10 +51,34 @@ You need to create a file called `config.json` which has the format described in
 Fill the quotation marks with your desired namespaces, etc.
 `config.json` is git-ignored so sensitive information, such as passwords, cannot not be pushed to GitHub.
 
-* For a list of available data centre zones, [see here]().
-* For a list of available Linux Virtual Machines, [see here]().
+* For a list of available data centre zones, [see here](https://cloud.google.com/compute/docs/regions-zones/viewing-regions-zones).
+* For a list of available Linux Virtual Machines, [see here](https://cloud.google.com/compute/docs/machine-types).
 * The versions of the BinderHub Helm Chart can be found [here](https://jupyterhub.github.io/helm-chart/#development-releases-binderhub) and are of the form `0.2.0-<commit-hash>`.
   It is advised to select the most recent version unless you specifically require an older one.
+
+```
+{
+  "gcloud": {
+    "project": "",            // Google Cloud project
+    "zone": "",               // Zone to deploy resources to
+    "node_count": 1,          // Number of nodes to deploy
+    "machine_type": "",       // Type of machine to deploy
+    "service_account": null,  // Google Cloud Service Account
+    "key_file": null          // Path to key file for Service log in
+  },
+  "binderhub": {
+    "name": "",               // Name of your BinderHub
+    "version": "",            // Helm chart version to deploy, should be 0.2.0-<commit-hash>
+    "contact_email": ""       // Email for letsencrypt https certificate. CANNOT be left blank.
+  },
+  "docker": {
+    "username": null,         // Docker username (can be supplied at runtime)
+    "password": null,         // Docker password (can be supplied at runtime)
+    "org": null,              // A DockerHub organisation to push images to (optional)
+    "image_prefix": ""        // The prefix to preprend to Docker images (e.g. "binder-prod")
+  }
+}
+```
 
 You can copy [`template-config.json`](./template-config.json) should you require.
 
@@ -127,3 +151,4 @@ We would like to acknowledge and thank the following people for their contributi
 * Gerard Gorman ([@ggorman](https://github.com/ggorman))
 * Tania Allard ([@trallard](https://github.com/trallard))
 * Diego Alonso Alvarez ([@dalonsoa](https://github.com/dalonsoa))
+* Min Ragan-Kelley ([@minrk](https://github.com/minrk))
