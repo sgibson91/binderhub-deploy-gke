@@ -74,26 +74,24 @@ Fill the quotation marks with your desired namespaces, etc.
 
 ```
 {
-  "azure": {
-    "subscription": "",   // Azure subscription name or ID (a hex-string)
-    "res_grp_name": "",   // Azure Resource Group name
-    "location": "",       // Azure Data Centre region
-    "node_count": 1,      // Number of nodes to deploy. 3 is preferrable for a stable cluster, but may be liable to caps.
-    "vm_size": "",        // Azure virtual machine type to deploy
-    "sp_app_id": null,    // Azure service principal ID (optional)
-    "sp_app_key": null,   // Azure service principal password (optional)
-    "sp_tenant_id": null  // Azure tenant ID (optional)
+  "gcloud": {
+    "project": "",            // Google Cloud project
+    "zone": "",               // Zone to deploy resources to
+    "node_count": 1,          // Number of nodes to deploy
+    "vm_size": "",            // Type of node to deploy
+    "service_account": null,  // Google Cloud Service Account
+    "key_file": null          // Path to key file for Service log in
   },
   "binderhub": {
-    "name": "",           // Name of your BinderHub
-    "version": "",        // Helm chart version to deploy, should be 0.2.0-<commit-hash>
-    "contact_email": ""   // Email for letsencrypt https certificate. CANNOT be left blank.
+    "name": "",               // Name of your BinderHub
+    "version": "",            // Helm chart version to deploy, should be 0.2.0-<commit-hash>
+    "contact_email": ""       // Email for letsencrypt https certificate. CANNOT be left blank.
   },
   "docker": {
-    "username": null,     // Docker username (can be supplied at runtime)
-    "password": null,     // Docker password (can be supplied at runtime)
-    "org": null,          // A DockerHub organisation to push images to (optional)
-    "image_prefix": ""    // The prefix to preprend to Docker images (e.g. "binder-prod")
+    "username": null,         // Docker username (can be supplied at runtime)
+    "password": null,         // Docker password (can be supplied at runtime)
+    "org": null,              // A DockerHub organisation to push images to (optional)
+    "image_prefix": ""        // The prefix to preprend to Docker images (e.g. "binder-prod")
   }
 }
 ```
