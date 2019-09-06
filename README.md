@@ -1,10 +1,10 @@
-# Automatically deploy a BinderHub to Microsoft Azure
+# Automatically deploy a BinderHub to Google Cloud
 
 ![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 [BinderHub](https://binderhub.readthedocs.io/en/latest/index.html) is a cloud-based, multi-server technology used for hosting repoducible computing environments and interactive Jupyter Notebooks built from code repositories.
 
-This repo contains a set of scripts to automatically deploy a BinderHub onto [Google Cloud](), and connect a [DockerHub](https://hub.docker.com/) container registry, so that you can host your own [Binder](https://mybinder.readthedocs.io/en/latest/) service.
+This repo contains a set of scripts to automatically deploy a BinderHub onto [Google Cloud](https://cloud.google.com/), and connect a [DockerHub](https://hub.docker.com/) container registry, so that you can host your own [Binder](https://mybinder.readthedocs.io/en/latest/) service.
 
 This repo is based on the following set of deployment scripts for Google Cloud: [nicain/binder-deploy](https://github.com/nicain/binder-deploy)
 
@@ -25,7 +25,7 @@ This repo is based on the following set of deployment scripts for Google Cloud: 
 
 ## Usage
 
-This repo can be run locally, by pulling and executing the container image, or as "Platform as a Service" through the "Deploy to Azure" button in the ["Deploy to Azure" Button](#deploy-to-azure-button) section.
+This repo can be run locally, by pulling and executing the container image, or as "Platform as a Service" through the "Cloud Run" button in the ["Cloud Run" Button](#cloud-run-button) section.
 
 To use these scripts locally, clone this repo and change into the directory.
 
