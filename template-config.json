@@ -1,18 +1,15 @@
 {
-  "azure": {
-    "subscription": "",
-    "res_grp_name": "",
-    "location": "",
+  "gcloud": {
+    "project": "",
+    "zone": "",
     "node_count": 1,
     "vm_size": "",
-    "sp_app_id": null,
-    "sp_app_key": null,
-    "sp_tenant_id": null
+    "service_account": null,
+    "key_file": null
   },
   "binderhub": {
     "name": "",
-    "version": "",
-    "contact_email": ""
+    "version": ""
   },
   "docker": {
     "username": null,
