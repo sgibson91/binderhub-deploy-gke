@@ -3,7 +3,7 @@
     "project": "",
     "zone": "",
     "node_count": 1,
-    "vm_size": "",
+    "machine_type": "",
     "service_account": null,
     "key_file": null
   },

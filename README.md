@@ -78,7 +78,7 @@ Fill the quotation marks with your desired namespaces, etc.
     "project": "",            // Google Cloud project
     "zone": "",               // Zone to deploy resources to
     "node_count": 1,          // Number of nodes to deploy
-    "vm_size": "",            // Type of node to deploy
+    "machine_type": "",       // Type of machine to deploy
     "service_account": null,  // Google Cloud Service Account
     "key_file": null          // Path to key file for Service log in
   },
