@@ -114,7 +114,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
     done
     if ! command -v az >/dev/null 2>&1 ; then
       echo "--> Attempting to install Google Cloud SDK with zypper packages"
-      ${sudo_command} zypper install -y google-cloud-sdk || { echo >&2 "--> azure-cli install failed; please install manually and re-run this script."; exit 1; }
+      ${sudo_command} zypper install -y google-cloud-sdk || { echo >&2 "--> google-cloud-sdk install failed; please install manually and re-run this script."; exit 1; }
     fi
     if ! command -v kubectl >/dev/null 2>&1 ; then
       echo "--> Attempting to install kubectl with zypper packages"
