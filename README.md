@@ -34,10 +34,9 @@ git clone https://github.com/alan-turing-institute/binderhub-deploy-gke.git
 cd binderhub-deploy-gke
 ```
 
-To make the scripts executable and then run them, do the following:
+To run the scripts, do the following:
 
-```
-chmod 700 <script-name>.sh
+```bash
 ./<script-name>.sh
 ```
 
