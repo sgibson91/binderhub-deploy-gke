@@ -5,10 +5,6 @@ terraform {
         google = {
             source  = "hashicorp/google"
         }
-        kubernetes = {
-            source  = "hashicorp/kubernetes"
-            version = "1.13.3"
-        }
     }
 }
 
@@ -17,15 +13,6 @@ provider "google" {
     credentials = file(var.credentials_file)
     project     = var.project_id
     region      = var.region
-}
-
-provider "kubernetes" {
-    load_config_file = false
-
-    host                   = google_container_cluster.primary.self_link
-    client_certificate     = google_container_cluster.primary.master_auth.0.client_certificate
-    client_key             = google_container_cluster.primary.master_auth.0.client_key
-    cluster_ca_certificate = google_container_cluster.primary.master_auth.0.cluster_ca_certificate
 }
 
 # Kubernetes cluster
