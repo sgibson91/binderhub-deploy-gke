@@ -49,6 +49,9 @@ done
 GKE_CLUSTER_NAME=$(echo "${BINDERHUB_NAME}" | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]' | cut -c 1-59)
 GKE_CLUSTER_NAME="${GKE_CLUSTER_NAME}-gke"
 
+# Format BinderHub name for Kubernetes
+HELM_BINDERHUB_NAME=$(echo "${BINDERHUB_NAME}" | tr -cd '[:alnum:]-.' | tr '[:upper:]' '[:lower:]' | sed -E -e 's/^([.-]+)//' -e 's/([.-]+)$//' )
+
 # Check if any optional variables are set null; if so, reset them to a
 # zero-length string for later checks. If they failed to read at all,
 # possibly due to an invalid JSON file, they will be returned as a
@@ -139,7 +142,7 @@ if [ "${HELM_VERSION}" == "v3" ] ; then
   echo "--> You are running helm v3!"
 elif [ "${HELM_VERSION}" == "v2" ] ; then
   echo "--> You have helm v2 installed, but we really recommend using helm v3."
-  echo "    Please install helm 3 and rerun this script."
+  echo "    Please install helm v3 and rerun this script."
   exit 1
 else
   echo "--> Helm not found. Please run setup.sh then rerun this script."
@@ -175,3 +178,14 @@ else
     -e "s/{dockerId}/${DOCKER_USERNAME}/" \
     "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
 fi
+
+# Install the BinderHub helm chart
+echo "--> Installing the Helm chart"
+$helm install "${HELM_BINDERHUB_NAME}" jupyterhub/binderhub \
+  --create-namespace \
+  --namespace "${HELM_BINDERHUB_NAME}" \
+  --version "${BINDERHUB_VERSION}" \
+  -f "${DIR}"/config.yaml \
+  -f "${DIR}"/secret.yaml \
+  --timeout 10m0s \
+  --wait | tee "${DIR}"/helm-chart-install.log
