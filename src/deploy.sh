@@ -149,3 +149,29 @@ fi
 # Setup helm repositories
 $helm repo add jupyterhub https://jupyterhub.github.io/helm-chart
 $helm repo update
+
+# Generate tokens for secrets file
+apiToken=$(openssl rand -hex 32)
+secretToken=$(openssl rand -hex 32)
+
+# Generate initial config files for deployment
+#
+# Generate secrets file
+echo "--> Generating secrets file"
+sed -e "s/{apiToken}/${apiToken}/" \
+  -e "s/{secretToken}/${secretToken}/" \
+  -e "s/{dockerId}/${DOCKER_USERNAME}/" \
+  -e "s/{dockerPassword}/${DOCKER_PASSWORD}/" \
+  "${DIR}"/templates/secret-template.yaml > "${DIR}"/secret.yaml
+
+# Generate initial config file
+echo "--> Generating initial configuration file"
+if [ -z "${DOCKER_ORG}" ] ; then
+  sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
+    -e "s/{dockerId}/${DOCKER_ORG}/" \
+    "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
+else
+  sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
+    -e "s/{dockerId}/${DOCKER_USERNAME}/" \
+    "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
+fi
