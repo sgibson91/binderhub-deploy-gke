@@ -1,0 +1,17 @@
+name: Run shellcheck and shfmt
+
+on:
+  push:
+    paths:
+      - "src/*"
+
+jobs:
+  shell-checker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Run shell-checker
+        uses: luizm/action-sh-checker@master
