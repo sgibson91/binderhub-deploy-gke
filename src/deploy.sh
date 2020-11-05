@@ -189,3 +189,51 @@ $helm install "${HELM_BINDERHUB_NAME}" jupyterhub/binderhub \
   -f "${DIR}"/secret.yaml \
   --timeout 10m0s \
   --wait | tee "${DIR}"/helm-chart-install.log
+
+# Wait for JupyterHub IP
+echo "--> Retrieving JupyterHub IP"
+HUB_IP=$(kubectl --namespace "${HELM_BINDERHUB_NAME}" get svc proxy-public | awk '{ print $4}' | tail -n 1)
+while [ "${HUB_IP}" = "<pending>" ] || [ "${HUB_IP}" = "" ] ; do
+  echo "Sleeping 30s before checking again"
+  sleep 30
+  HUB_IP=$(kubectl --namespace "${HELM_BINDERHUB_NAME}" get svc proxy-public | awk '{ print $4}' | tail -n 1)
+  echo "JupyterHub IP: ${HUB_IP}" | tee "${DIR}"/jupyterhub-ip.log
+done
+
+# Update config file
+echo "--> Finalising configuration"
+if [ -z "${DOCKER_ORG}" ] ; then
+  sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
+    -e "s/{dockerId}/${DOCKER_ORG}/" \
+    -e "s/{hubIpAddr}/${HUB_IP}/" \
+    "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
+else
+  sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
+    -e "s/{dockerId}/${DOCKER_USERNAME}/" \
+    -e "s/{hubIpAddr}/${HUB_IP}/" \
+    "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
+fi
+
+# Upgrade the helm chart
+echo "--> Upgrading helm chart"
+$helm upgrade "${HELM_BINDERHUB_NAME}" jupyterhub/binderhub \
+  --namespace "${HELM_BINDERHUB_NAME}" \
+  --version "${BINDERHUB_VERSION}" \
+  -f "${DIR}"/config.yaml \
+  -f "${DIR}"/secret.yaml \
+  --cleanup-on-fail \
+  --timeout 10m0s \
+  --wait
+
+# Print Binder IP address
+echo "--> Retrieving Binder IP address"
+BINDER_IP=$(kubectl --namespace "${HELM_BINDERHUB_NAME}" get svc binder | awk '{ print $4}' | tail -n 1)
+echo "Binder IP: ${BINDER_IP}" | tee "${DIR}"/binder-ip.log
+while [ "${BINDER_IP}" = '<pending>' ] || [ "${BINDER_IP}" = "" ]; do
+  echo "Sleeping 30s before checking again"
+  sleep 30
+  BINDER_IP=$(kubectl --namespace "${HELM_BINDERHUB_NAME}" get svc binder | awk '{ print $4}' | tail -n 1)
+  echo "Binder IP: ${BINDER_IP}" | tee "${DIR}"/binder-ip.log
+done
+
+echo "--> BinderHub successfully deployed!"
