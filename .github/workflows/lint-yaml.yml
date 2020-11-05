@@ -1,0 +1,21 @@
+name: Lint YAML templates
+
+on:
+  push:
+   paths:
+     - "templates/*"
+
+jobs:
+  lint-yaml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Run yamllint
+        uses: karancode/yamllint-github-action@v2.0.0
+        with:
+          yamllint_file_or_dir: templates
+          yamllint_strict: false
+          yamllint_comment: false

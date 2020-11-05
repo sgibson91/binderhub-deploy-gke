@@ -1,5 +1,0 @@
-config:
-  BinderHub:
-    use_registry: true
-    image_prefix: <docker-id>/<prefix>-
-    hub_url: http://<jupyterhub-ip>

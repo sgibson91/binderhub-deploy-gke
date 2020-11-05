@@ -1,0 +1,38 @@
+name: Check Setup
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check-setup:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Run setup.sh
+        working-directory: src
+        run: |
+          chmod +x *.sh
+          ./setup.sh
+
+      - name: Check helm major version
+        run: |
+          HELM_VERSION=$(helm version --short -c | cut -f1 -d".")
+          echo "${HELM_VERSION}"
+          [ "${HELM_VERSION}" = 'v3' ]
