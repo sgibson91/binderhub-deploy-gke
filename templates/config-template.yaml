@@ -1,3 +1,4 @@
+---
 config:
   BinderHub:
     hub_url: "http://{hubIpAddr}"
