@@ -20,6 +20,7 @@ If you are building a BinderHub as a service for an organisation, your instituti
 - [:children_crossing: Usage](#children_crossing-usage)
   - [:key: Create a Service Account key](#key-create-a-service-account-key)
   - [:vertical_traffic_light: `setup.sh`](#vertical_traffic_light-setupsh)
+  - [:rocket: `deploy.sh`](#rocket-deploysh)
 
 ---
 
@@ -113,3 +114,19 @@ The CLIs to be installed are:
 - [Helm (`helm`)](https://helm.sh/docs/using_helm/#from-script)
 
 Any dependencies that are not automatically installed by these packages will also be installed.
+
+### :rocket: `deploy.sh`
+
+This script reads in values from `config.json` and deploys a Kubernetes cluster.
+It then creates `config.yaml` and `secret.yaml` files which are used to install the BinderHub using the templates in the [`templates` folder](./templates/).
+
+The script will ask for your Docker ID and password if you haven't supplied them in the config file.
+The ID is your Docker username, **NOT** the associated email.
+If you have provided a Docker organisation in `config.json`, then Docker ID **MUST** be a member of this organisation.
+
+Both a JupyterHub and BinderHub are installed via a Helm Chart onto the deployed Kubernetes cluster and the `config.yaml` file is updated with the JupyterHub IP address.
+
+`config.yaml` and `secret.yaml` are both git-ignored so that secrets cannot be pushed back to GitHub.
+
+The script also outputs log files (`<file-name>.log`) for each stage of the deployment.
+These files are also git-ignored.
