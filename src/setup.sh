@@ -13,11 +13,11 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		# Update apt before starting, in case this is a new container
 		${sudo_command} apt update
 		APTPACKAGES=" \
-      curl \
-      python \
-      openssl \
-      jq \
-      "
+            curl \
+            python \
+            openssl \
+            jq \
+            "
 		for package in $APTPACKAGES; do
 			if ! dpkg -s "$package" >/dev/null; then
 				echo "--> Apt installing $package"
@@ -27,7 +27,7 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 				}
 			fi
 		done
-		if ! command -v az >/dev/null 2>&1; then
+		if ! command -v gcloud >/dev/null 2>&1; then
 			echo "--> Attempting to install Google Cloud SDK with deb packages"
 			echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | ${sudo_command} tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 			${sudo_command} apt-get -y install apt-transport-https ca-certificates gnupg
@@ -45,8 +45,17 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 				exit 1
 			}
 		fi
+        if ! command -v terraform >/dev/null 2>&1; then
+            echo "--> Attempting to install Terraform CLI with deb packages"
+            curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+            ${sudo_command} apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+            ${sudo_command} apt-get update && sudo apt-get install terraform || {
+                echo >&2 "--> terraform install failed; please install manually and rerun this script."
+                exit 1
+            }
+        fi
 
-		## yum-based systems
+	## yum-based systems
 	elif command -v yum >/dev/null 2>&1; then
 		# shellcheck disable=SC2143
 		if [ "$(cmd file /etc/redhat-release | grep -q centos)" ]; then
@@ -63,13 +72,13 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		fi
 		echo "--> Checking system packages and installing any missing packages"
 		YUMPACKAGES=" \
-      jq \
-      curl \
-      python \
-      tar \
-      which \
-      openssl \
-      "
+            jq \
+            curl \
+            python \
+            tar \
+            which \
+            openssl \
+            "
 		for package in $YUMPACKAGES; do
 			if ! rpm -q "$package" >/dev/null; then
 				echo "--> Yum installing $package"
@@ -79,7 +88,7 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 				}
 			fi
 		done
-		if ! command -v az >/dev/null 2>&1; then
+		if ! command -v gcloud >/dev/null 2>&1; then
 			echo "--> Attempting to install Google Cloud SDK with yum packages"
 			${sudo_command} tee -a /etc/yum.repos.d/google-cloud-sdk.repo <<EOM
 [google-cloud-sdk]
@@ -91,7 +100,10 @@ repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOM
-			${sudo_command} yum install -y google-cloud-sdk
+			${sudo_command} yum install -y google-cloud-sdk || {
+                echo >&2 "--> Google Cloud SDK install failed; please install manually and re-run this script."
+                exit 1
+            }
 		fi
 		if ! command -v kubectl >/dev/null 2>&1; then
 			echo "--> Attempting to install kubectl with yum packages"
@@ -108,18 +120,26 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 				exit 1
 			}
 		fi
+        if ! command -v terraform >/dev/null 2>&1; then
+            echo "--> Attempting to install terraform with yum packages"
+            ${sudo_command} yum install -y yum-utils
+            ${sudo_command} yum-config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+            ${sudo_command} yum -y install terraform || {
+                echo >&2 "--> terraform install failed; please install manually and re-run this script."
+                exit 1
+            }
 
-		## zypper-based systems
+	## zypper-based systems
 	elif command -v zypper >/dev/null 2>&1; then
 		echo "--> Checking system packages and installing any missing packages"
 		ZYPPERPACKAGES=" \
-      curl \
-      python \
-      tar \
-      which \
-      jq \
-      openssl \
-      "
+            curl \
+            python \
+            tar \
+            which \
+            jq \
+            openssl \
+            "
 		for package in $ZYPPERPACKAGES; do
 			if ! rpm -q "$package" >/dev/null; then
 				echo "--> Zypper installing $package"
@@ -129,7 +149,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 				}
 			fi
 		done
-		if ! command -v az >/dev/null 2>&1; then
+		if ! command -v gcloud >/dev/null 2>&1; then
 			echo "--> Attempting to install Google Cloud SDK with zypper packages"
 			${sudo_command} zypper install -y google-cloud-sdk || {
 				echo >&2 "--> google-cloud-sdk install failed; please install manually and re-run this script."
@@ -144,22 +164,37 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 				exit 1
 			}
 		fi
+        if ! command -v terraform >/dev/null 2>&1; then
+            echo "--> Attempting to install kubectl with zypper packages"
+            ${sudo_command} zypper addrepo --refresh https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_15.2 snappy
+            ${sudo_command} zypper --gpg-auto-import-keys refresh
+            ${sudo_command} zypper dup --from snappy
+            ${sudo_command} zypper install snapd
+            ${sudo_command} systemctl enable snapd
+            ${sudo_command} systemctl start snapd
+            ${sudo_command} systemctl enable snapd.apparmor
+            ${sudo_command} systemctl start snapd.apparmor
+            ${sudo_command} snap install terraform || {
+                echo >&2 "--> terraform install failed; please install manually and re-run this script."
+                exit 1
+            }
 
-		## pacman-based systems
+	## pacman-based systems
 	elif command -v pacman >/dev/null 2>&1; then
 		echo "--> Checking system packages and installing any missing packages"
 		PACMANPACKAGES=" \
-      curl \
-      python \
-      tar \
-      which \
-      jq \
-      gcc \
-      awk \
-      grep \
-      openssl \
-      kubectl \
-      "
+            curl \
+            python \
+            tar \
+            which \
+            jq \
+            gcc \
+            awk \
+            grep \
+            openssl \
+            kubectl \
+            unzip \
+            "
 		for package in $PACMANPACKAGES; do
 			if ! pacman -Q "$package" 2>/dev/null; then
 				echo "--> pacman installing $package"
@@ -178,8 +213,18 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 				exit 1
 			}
 		fi
+        echo "--> Attempting to install terraform with curl"
+        if ! command -v terraform >/dev/null 2>&1; then
+            curl -LO https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_arm64.zip
+            unzip terraform_0.13.5_linux_arm64.zip
+            ${sudo_command} mv terraform /usr/local/bin/
+            terraform -help || {
+                echo >&2 "--> terraform install failed; please install manually and re-run this script."
+                exit 1
+            }
+        fi
 
-		## Mystery linux system without any of our recognised package managers
+	## Mystery linux system without any of our recognised package managers
 	else
 		command -v curl >/dev/null 2>&1 || {
 			echo >&2 "curl not found; please install and re-run this script."
@@ -219,6 +264,16 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 			chmod +x ./kubectl
 			${sudo_command} mv ./kubectl /usr/local/bin/kubectl
 		fi
+        echo "--> Attempting to install terraform with curl"
+        if ! command -v terraform >/dev/null 2>&1; then
+            curl -LO https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_arm64.zip
+            unzip terraform_0.13.5_linux_arm64.zip
+            ${sudo_command} mv terraform /usr/local/bin/
+            terraform -help || {
+                echo >&2 "--> terraform install failed; please install manually and re-run this script."
+                exit 1
+            }
+        fi
 	fi
 
 	## Helm isn't well packaged for Linux, alas
@@ -248,7 +303,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 			exit 1
 		}
 		echo "--> Helm doesn't have a system package; attempting to install with curl"
-		curl https://raw.githubusercontent.com/helm/helm/master/scripts/get >get_helm.sh
+		curl https://raw.githubusercontent.com/helm/helm/master/scripts/get > get_helm.sh
 		chmod 700 get_helm.sh
 		./get_helm.sh || {
 			echo >&2 "--> helm install failed; please install manually and re-run this script."
@@ -261,15 +316,15 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 	if command -v brew >/dev/null 2>&1; then
 		echo "--> Checking brew packages and installing any missing packages"
 		BREWPACKAGES=" \
-      curl \
-      python \
-      kubernetes-cli \
-      kubernetes-helm \
-      jq \
-      "
+            curl \
+            python \
+            kubernetes-cli \
+            kubernetes-helm \
+            jq \
+            "
 		BREWCASKS=" \
-      google-cloud-sdk \
-      "
+            google-cloud-sdk \
+            "
 		brew update
 		for package in $BREWPACKAGES; do
 			if ! brew ls --versions "$package" >/dev/null; then
@@ -289,6 +344,14 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 				}
 			fi
 		done
+        if ! brew ls --versions terraform >/dev/null; then
+            echo "--> Brew installing terraform"
+            brew tap hashicorp/tap
+            brew install hashicorp/tap/terraform || {
+                echo >&2 "--> terraform install failed; please install manually and re-run this script."
+                exit 1
+            }
+        fi
 	else
 		command -v curl >/dev/null 2>&1 || {
 			echo >&2 "curl not found; please install and re-run this script."
@@ -333,5 +396,15 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 				exit 1
 			}
 		fi
+        echo "--> Attempting to install terraform with curl"
+        if ! command -v terraform >/dev/null 2>&1; then
+            curl -LO https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_arm64.zip
+            unzip terraform_0.13.5_linux_arm64.zip
+            ${sudo_command} mv terraform /usr/local/bin/
+            terraform -help || {
+                echo >&2 "--> terraform install failed; please install manually and re-run this script."
+                exit 1
+            }
+        fi
 	fi
 fi
