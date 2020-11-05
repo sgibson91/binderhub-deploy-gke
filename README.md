@@ -19,6 +19,7 @@ If you are building a BinderHub as a service for an organisation, your instituti
 
 - [:children_crossing: Usage](#children_crossing-usage)
   - [:key: Create a Service Account key](#key-create-a-service-account-key)
+  - [:vertical_traffic_light: `setup.sh`](#vertical_traffic_light-setupsh)
 
 ---
 
@@ -99,3 +100,16 @@ You will provide the path to this file under `credentials_file` in `config.json`
 > :rotating_light: The service account key file provides access to your Google cloud project.
 > It should be treated like any other secret credential.
 > Specifically, it should **never** be checked into source control. :rotating_light:
+
+### :vertical_traffic_light: `setup.sh`
+
+This script checks whether the required command line tools are already installed.
+If any are missing, the script uses the system package manager or [`curl`](https://curl.haxx.se/docs/) to install the command line interfaces (CLIs).
+The CLIs to be installed are:
+
+- [Hashicorp Terraform](https://www.terraform.io/)
+- [Google Cloud SDK (`gcloud`)](https://cloud.google.com/sdk)
+- [Kubernetes (`kubectl`)](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-using-curl)
+- [Helm (`helm`)](https://helm.sh/docs/using_helm/#from-script)
+
+Any dependencies that are not automatically installed by these packages will also be installed.
