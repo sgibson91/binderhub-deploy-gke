@@ -21,6 +21,10 @@ If you are building a BinderHub as a service for an organisation, your instituti
   - [:key: Create a Service Account key](#key-create-a-service-account-key)
   - [:vertical_traffic_light: `setup.sh`](#vertical_traffic_light-setupsh)
   - [:rocket: `deploy.sh`](#rocket-deploysh)
+  - [:bar_chart: `logs.sh`](#bar_chart-logssh)
+  - [:information_source: `info.sh`](#ℹinformation_source-infosh)
+  - [:arrow_up: `upgrade.sh`](#️arrow_up-upgradesh)
+  - [:boom: `teardown.sh`](#boom-teardownsh)
 
 ---
 
@@ -130,3 +134,24 @@ Both a JupyterHub and BinderHub are installed via a Helm Chart onto the deployed
 
 The script also outputs log files (`<file-name>.log`) for each stage of the deployment.
 These files are also git-ignored.
+
+### :bar_chart: `logs.sh`
+
+This script will print the JupyterHub logs to the terminal to assist with debugging issues with the BinderHub.
+It reads from `config.json` in order to get the BinderHub name.
+
+### :information_source: `info.sh`
+
+This script will print the pod status of the Kubernetes cluster and the IP addresses of both the JupyterHub and BinderHub to the terminal.
+It reads the BinderHub name from `config.json`.
+
+### :arrow_up: `upgrade.sh`
+
+This script will automatically upgrade the Helm Chart deployment configuring the BinderHub and then prints the Kubernetes pods.
+It reads the BinderHub name and Helm Chart version from `config.json`.
+
+### :boom: `teardown.sh`
+
+This script will run the `terraform destroy -auto-approve` command to destroy all deployed resources.
+It will read the `terraform.tfstate` (which will be git-ignored) file under `terraform` directory.
+The user should check the [Google Cloud Console](https://console.cloud.google.com/home/dashboard) to verify the resources have been deleted.
