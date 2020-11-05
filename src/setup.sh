@@ -341,7 +341,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 		exit 1
 	}
 	echo "--> Helm doesn't have a system package; attempting to install with curl"
-	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get >get_helm.sh
+	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >get_helm.sh
 	chmod 700 get_helm.sh
 	./get_helm.sh || {
 		echo >&2 "--> helm install failed; please install manually and re-run this script."
@@ -357,7 +357,7 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 			curl \
 			python \
 			kubernetes-cli \
-			kubernetes-helm \
+			helm \
 			jq \
 			"
 		BREWCASKS=" \
@@ -434,7 +434,7 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 		fi
 		echo "--> Attempting to install helm with curl"
 		if ! command -v helm >/dev/null 2>&1; then
-			curl -L https://raw.githubusercontent.com/helm/helm/master/scripts/get >get_helm.sh
+			curl -L https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >get_helm.sh
 			chmod 700 get_helm.sh
 			./get_helm.sh || {
 				echo >&2 "--> helm install failed; please install manually and re-run this script."
@@ -468,19 +468,14 @@ else
 			"
 		choco upgrade chocolatey -y
 		for package in $CHOCPACKAGES; do
-			if [ "$package" == "kubernetes-helm" ]; then
+			if ! choco search --local-only "$package" >/dev/null; then
 				echo "--> Choco installing $package"
-				choco install "$package" --version 2.16.3 --allow-downgrade -y
+				choco install "$package" || {
+					echo >&2 "--> $package install failed; please install manually and re-run this script."
+					exit 1
+				}
 			else
-				if ! choco search --local-only "$package" >/dev/null; then
-					echo "--> Choco installing $package"
-					choco install "$package" || {
-						echo >&2 "--> $package install failed; please install manually and re-run this script."
-						exit 1
-					}
-				else
-					echo "--> $package is already installed"
-				fi
+				echo "--> $package is already installed"
 			fi
 		done
 	else
