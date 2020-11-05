@@ -25,6 +25,7 @@ If you are building a BinderHub as a service for an organisation, your instituti
   - [:information_source: `info.sh`](#ℹinformation_source-infosh)
   - [:arrow_up: `upgrade.sh`](#️arrow_up-upgradesh)
   - [:boom: `teardown.sh`](#boom-teardownsh)
+- [:art: Customising your BinderHub Deployment](#art-customising-your-binderhub-deployment)
 
 ---
 
@@ -155,3 +156,12 @@ It reads the BinderHub name and Helm Chart version from `config.json`.
 This script will run the `terraform destroy -auto-approve` command to destroy all deployed resources.
 It will read the `terraform.tfstate` (which will be git-ignored) file under `terraform` directory.
 The user should check the [Google Cloud Console](https://console.cloud.google.com/home/dashboard) to verify the resources have been deleted.
+
+## :art: Customising your BinderHub Deployment
+
+Customising your BinderHub deployment is as simple as editing `config.yaml` and/or `secret.yaml` and then upgrading the BinderHub Helm Chart.
+The Helm Chart can be upgraded by running [`upgrade.sh`](./upgrade.sh) (make sure you have the CLIs installed by running [`setup.sh`](./setup.sh) first).
+
+The Jupyter guide to customising the underlying JupyterHub can be found [here](https://zero-to-jupyterhub.readthedocs.io/en/latest/extending-jupyterhub.html).
+
+The BinderHub guide for changing the landing page logo can be found [here](https://binderhub.readthedocs.io/en/latest/customizing.html#template-customization).
