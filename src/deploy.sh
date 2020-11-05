@@ -171,11 +171,11 @@ sed -e "s/{apiToken}/${apiToken}/" \
 echo "--> Generating initial configuration file"
 if [ -z "${DOCKER_ORG}" ] ; then
   sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
-    -e "s/{dockerId}/${DOCKER_ORG}/" \
+    -e "s/{dockerId}/${DOCKER_USERNAME}/" \
     "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
 else
   sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
-    -e "s/{dockerId}/${DOCKER_USERNAME}/" \
+    -e "s/{dockerId}/${DOCKER_ORG}/" \
     "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
 fi
 
@@ -204,12 +204,12 @@ done
 echo "--> Finalising configuration"
 if [ -z "${DOCKER_ORG}" ] ; then
   sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
-    -e "s/{dockerId}/${DOCKER_ORG}/" \
+    -e "s/{dockerId}/${DOCKER_USERNAME}/" \
     -e "s/{hubIpAddr}/${HUB_IP}/" \
     "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
 else
   sed -e "s/{imagePrefix}/${IMAGE_PREFIX}/" \
-    -e "s/{dockerId}/${DOCKER_USERNAME}/" \
+    -e "s/{dockerId}/${DOCKER_ORG}/" \
     -e "s/{hubIpAddr}/${HUB_IP}/" \
     "${DIR}"/templates/config-template.yaml > "${DIR}"/config.yaml
 fi
