@@ -9,41 +9,146 @@ DIR="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}")")" >/dev/null 2>&1 && pwd)"
 # Read in config file and assign variables
 configFile="${DIR}/config.json"
 
-echo "--> Reading configuration from ${configFile}"
+## Detection of deploy mode
+#
+# This script should handle both interactive deployment when run by a user
+# on their local system, and also running as a container entrypoint when used
+# either for a container-based local deployment or when deployed via a Google
+# Cloud Run blue button setup.
+#
+# Check whether CONTAINER_MODE is set, and if so assume running as a
+# container-based install, checking that all required input is present in the
+# form of environment variables.
 
-BINDERHUB_NAME=$(jq -r '.binderhub .name' "${configFile}")
-BINDERHUB_VERSION=$(jq -r '.binderhub .version' "${configFile}")
-DOCKER_ORG=$(jq -r '.docker .org' "${configFile}")
-DOCKER_USERNAME=$(jq -r '.docker .username' "${configFile}")
-DOCKER_PASSWORD=$(jq -r '.docker .password' "${configFile}")
-GCP_ACCOUNT_EMAIL=$(jq -r '.gcp .email_account' "${configFile}")
-GCP_PROJECT_ID=$(jq -r '.gcp .project_id' "${configFile}")
-GCP_PROJECT_CREDS=$(jq -r '.gcp .credentials_file' "${configFile}")
-GCP_REGION=$(jq -r '.gcp .region' "${configFile}")
-GCP_ZONE=$(jq -r '.gcp .zone' "${configFile}")
-GKE_NODE_COUNT=$(jq -r '.gke .node_count' "${configFile}")
-GKE_MACHINE_TYPE=$(jq -r '.gke .machine_type' "${configFile}")
-IMAGE_PREFIX=$(jq -r '.binderhub .image_prefix' "${configFile}")
+if [[ -n $CONTAINER_MODE ]]; then
+	echo "--> Deployment operating in container mode"
+	echo "--> Checking required environment variables"
 
-# Check that all variables are set non-zero, non-null
-REQUIRED_VARS=" \
-  BINDERHUB_NAME \
-  BINDERHUB_VERSION \
-  GCP_ACCOUNT_EMAIL \
-  GCP_PROJECT_ID \
-  GCP_PROJECT_CREDS \
-  GCP_REGION \
-  GCP_ZONE \
-  GKE_NODE_COUNT \
-  GKE_MACHINE_TYPE \
-  IMAGE_PREFIX \
-  "
-for required_var in $REQUIRED_VARS; do
-	if [ -z "${!required_var}" ] || [ "x${!required_var}" == 'xnull' ]; then
-		echo "--> ${required_var} must be set for deployment" >&2
-		exit 1
+	REQUIRED_VARS=" \
+		BINDERHUB_NAME \
+		BINDERHUB_VERSION \
+		DOCKER_USERNAME \
+		DOCKER_PASSWORD \
+		GCP_ACCOUNT_EMAIL \
+		GCP_PROJECT_ID \
+		GCP_REGION \
+		GCP_ZONE \
+		GKE_NODE_COUNT \
+		GKE_MACHINE_TYPE \
+		IMAGE_PREFIX \
+		"
+	for required_var in $REQUIRED_VARS; do
+		if [ -z "${!required_var}" ]; then
+			echo "--> ${required_var} must be set for container-based deployment" >&2
+			exit 1
+		fi
+	done
+
+	# Check if DOCKER_ORG is set to null. Return empty string if true.
+	if [ "x${DOCKER_ORG}" == 'xnull' ]; then DOCKER_ORG=""; fi
+
+	# Print configuration
+	echo "--> Configuration to deploy:
+		BINDERHUB_NAME: ${BINDERHUB_NAME}
+		BINDERHUB_VERSION: ${BINDERHUB_VERSION}
+		DOCKER_ORG: ${DOCKER_ORG}
+		DOCKER_USERNAME: ${DOCKER_USERNAME}
+		GCP_ACCOUNT_EMAIL: ${GCP_ACCOUNT_EMAIL}
+		GCP_PROJECT_ID: ${GCP_PROJECT_ID}
+		GCP_REGION: ${GCP_REGION}
+		GCP_ZONE: ${GCP_ZONE}
+		GKE_MACHINE_TYPE: ${GKE_MACHINE_TYPE}
+		GKE_NODE_COUNT: ${GKE_NODE_COUNT}
+		IMAGE_PREFIX: ${IMAGE_PREFIX}
+		" | tee "${DIR}"/read-config.log
+
+	# Authenticate with gcloud
+	gcloud auth activate-service-account --key-file "${DIR}"/key_file.json
+
+else
+	echo "--> Reading configuration from ${configFile}"
+
+	BINDERHUB_NAME=$(jq -r '.binderhub .name' "${configFile}")
+	BINDERHUB_VERSION=$(jq -r '.binderhub .version' "${configFile}")
+	DOCKER_ORG=$(jq -r '.docker .org' "${configFile}")
+	DOCKER_USERNAME=$(jq -r '.docker .username' "${configFile}")
+	DOCKER_PASSWORD=$(jq -r '.docker .password' "${configFile}")
+	GCP_ACCOUNT_EMAIL=$(jq -r '.gcp .email_account' "${configFile}")
+	GCP_PROJECT_ID=$(jq -r '.gcp .project_id' "${configFile}")
+	GCP_PROJECT_CREDS=$(jq -r '.gcp .credentials_file' "${configFile}")
+	GCP_REGION=$(jq -r '.gcp .region' "${configFile}")
+	GCP_ZONE=$(jq -r '.gcp .zone' "${configFile}")
+	GKE_NODE_COUNT=$(jq -r '.gke .node_count' "${configFile}")
+	GKE_MACHINE_TYPE=$(jq -r '.gke .machine_type' "${configFile}")
+	IMAGE_PREFIX=$(jq -r '.binderhub .image_prefix' "${configFile}")
+
+	# Check that all variables are set non-zero, non-null
+	REQUIRED_VARS=" \
+		BINDERHUB_NAME \
+		BINDERHUB_VERSION \
+		GCP_ACCOUNT_EMAIL \
+		GCP_PROJECT_ID \
+		GCP_PROJECT_CREDS \
+		GCP_REGION \
+		GCP_ZONE \
+		GKE_NODE_COUNT \
+		GKE_MACHINE_TYPE \
+		IMAGE_PREFIX \
+		"
+	for required_var in $REQUIRED_VARS; do
+		if [ -z "${!required_var}" ] || [ "x${!required_var}" == 'xnull' ]; then
+			echo "--> ${required_var} must be set for deployment" >&2
+			exit 1
+		fi
+	done
+
+	# Check if any optional variables are set null; if so, reset them to a
+	# zero-length string for later checks. If they failed to read at all,
+	# possibly due to an invalid JSON file, they will be returned as a
+	# zero-length string -- this is attempting to make the 'not set'
+	# value the same in either case.
+	if [ "x${DOCKER_ORG}" == 'xnull' ]; then DOCKER_ORG=''; fi
+	if [ "x${DOCKER_USERNAME}" == 'xnull' ]; then DOCKER_USERNAME=''; fi
+	if [ "x${DOCKER_PASSWORD}" == 'xnull' ]; then DOCKER_PASSWORD=''; fi
+
+	# Normalise region, zone and machine_type to remove spaces and have lowercase
+	GCP_REGION=$(echo "${GCP_REGION//[[:blank:]]/}" | tr "[:upper:]" "[:lower:]")
+	GCP_ZONE=$(echo "${GCP_ZONE//[[:blank:]]/}" | tr "[:upper:]" "[:lower:]")
+	GKE_MACHINE_TYPE=$(echo "${GKE_MACHINE_TYPE//[[:blank:]]/}" | tr "[:upper:]" "[:lower:]")
+
+	# Check/get user's Docker credentials
+	if [ -z "${DOCKER_USERNAME}" ]; then
+		if [ -n "${DOCKER_ORG}" ]; then
+			echo "--> Your Docker ID must be a member of the ${DOCKER_ORG} organisation"
+		fi
+		read -rp "Docker Hub ID: " DOCKER_USERNAME
+		read -rsp "Docker Hub password: " DOCKER_PASSWORD
+		echo
+	else
+		if [ -z "${DOCKER_PASSWORD}" ]; then
+			read -rsp "Docker Hub password for ${DOCKER_USERNAME}: " DOCKER_PASSWORD
+			echo
+		fi
 	fi
-done
+
+	# Print configuration
+	echo "--> Configuration to deploy:
+		BINDERHUB_NAME: ${BINDERHUB_NAME}
+		BINDERHUB_VERSION: ${BINDERHUB_VERSION}
+		DOCKER_ORG: ${DOCKER_ORG}
+		DOCKER_USERNAME: ${DOCKER_USERNAME}
+		GCP_ACCOUNT_EMAIL: ${GCP_ACCOUNT_EMAIL}
+		GCP_PROJECT_ID: ${GCP_PROJECT_ID}
+		GCP_PROJECT_CREDS: ${GCP_PROJECT_CREDS}
+		GCP_REGION: ${GCP_REGION}
+		GCP_ZONE: ${GCP_ZONE}
+		GKE_MACHINE_TYPE: ${GKE_MACHINE_TYPE}
+		GKE_NODE_COUNT: ${GKE_NODE_COUNT}
+		IMAGE_PREFIX: ${IMAGE_PREFIX}
+		" | tee "${DIR}"/read-config.log
+fi
+
+#==============================================================================#
 
 # Generate valid name for GKE cluster
 GKE_CLUSTER_NAME=$(echo "${BINDERHUB_NAME}" | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]' | cut -c 1-59)
@@ -51,52 +156,6 @@ GKE_CLUSTER_NAME="${GKE_CLUSTER_NAME}-gke"
 
 # Format BinderHub name for Kubernetes
 HELM_BINDERHUB_NAME=$(echo "${BINDERHUB_NAME}" | tr -cd '[:alnum:]-.' | tr '[:upper:]' '[:lower:]' | sed -E -e 's/^([.-]+)//' -e 's/([.-]+)$//')
-
-# Check if any optional variables are set null; if so, reset them to a
-# zero-length string for later checks. If they failed to read at all,
-# possibly due to an invalid JSON file, they will be returned as a
-# zero-length string -- this is attempting to make the 'not set'
-# value the same in either case.
-if [ "x${DOCKER_ORG}" == 'xnull' ]; then DOCKER_ORG=''; fi
-if [ "x${DOCKER_USERNAME}" == 'xnull' ]; then DOCKER_USERNAME=''; fi
-if [ "x${DOCKER_PASSWORD}" == 'xnull' ]; then DOCKER_PASSWORD=''; fi
-
-# Normalise region, zone and machine_type to remove spaces and have lowercase
-GCP_REGION=$(echo "${GCP_REGION//[[:blank:]]/}" | tr "[:upper:]" "[:lower:]")
-GCP_ZONE=$(echo "${GCP_ZONE//[[:blank:]]/}" | tr "[:upper:]" "[:lower:]")
-GKE_MACHINE_TYPE=$(echo "${GKE_MACHINE_TYPE//[[:blank:]]/}" | tr "[:upper:]" "[:lower:]")
-
-# Check/get user's Docker credentials
-if [ -z "${DOCKER_USERNAME}" ]; then
-	if [ -n "${DOCKER_ORG}" ]; then
-		echo "--> Your Docker ID must be a member of the ${DOCKER_ORG} organisation"
-	fi
-	read -rp "Docker Hub ID: " DOCKER_USERNAME
-	read -rsp "Docker Hub password: " DOCKER_PASSWORD
-	echo
-else
-	if [ -z "${DOCKER_PASSWORD}" ]; then
-		read -rsp "Docker Hub password for ${DOCKER_USERNAME}: " DOCKER_PASSWORD
-		echo
-	fi
-fi
-
-# Print configuration
-echo "--> Configuration to deploy:
-  BINDERHUB_NAME: ${BINDERHUB_NAME}
-  BINDERHUB_VERSION: ${BINDERHUB_VERSION}
-  DOCKER_ORG: ${DOCKER_ORG}
-  DOCKER_USERNAME: ${DOCKER_USERNAME}
-  GCP_ACCOUNT_EMAIL: ${GCP_ACCOUNT_EMAIL}
-  GCP_PROJECT_ID: ${GCP_PROJECT_ID}
-  GCP_PROJECT_CREDS: ${GCP_PROJECT_CREDS}
-  GCP_REGION: ${GCP_REGION}
-  GCP_ZONE: ${GCP_ZONE}
-  GKE_CLUSTER_NAME: ${GKE_CLUSTER_NAME}
-  GKE_MACHINE_TYPE: ${GKE_MACHINE_TYPE}
-  GKE_NODE_COUNT: ${GKE_NODE_COUNT}
-  IMAGE_PREFIX: ${IMAGE_PREFIX}
-  " | tee "${DIR}"/read-config.log
 
 # Deploy cluster using terraform
 cd "${DIR}/terraform"
