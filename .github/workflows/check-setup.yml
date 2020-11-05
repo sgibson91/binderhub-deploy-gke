@@ -1,0 +1,26 @@
+name: Check Setup
+
+on: [push, pull_request]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  check-setup:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Run setup.sh
+        working-directory: src
+        run: |
+          chmod +x *.sh
+          ./setup.sh
