@@ -16,7 +16,9 @@ Your resources will be frozen once your trial expires, then deleted if you do no
 If you are building a BinderHub as a service for an organisation, your institution may already have a Google Cloud account.
 
 **Table of Contents:**
+
 - [:children_crossing: Usage](#children_crossing-usage)
+  - [:key: Create a Service Account key](#key-create-a-service-account-key)
 
 ---
 
@@ -79,3 +81,21 @@ Fill the quotation marks with your desired namespaces, etc.
 You can copy [`template-config.json`](./template-config.json) should you require.
 
 **Please note that all entries in `template-config.json` must be surrounded by double quotation marks (`"`), with the exception of `node_count` or if the value is `null`.**
+
+### :key: Create a Service Account key
+
+This script will access your Google Cloud account using a [Service Account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+[Create one now](https://console.cloud.google.com/apis/credentials/serviceaccountkey) in the console using the following settings:
+
+1. Select the project you are going to use (in the blue bar along the top of the browser window).
+2. Under "Service account", select "New service account".
+3. Give it any name you like!
+4. For the Role, choose "Project -> Editor".
+5. Leave the "Key Type" as JSON.
+6. Click "Create" to create the key and save the key file to your system.
+
+You will provide the path to this file under `credentials_file` in `config.json` described above.
+
+> :rotating_light: The service account key file provides access to your Google cloud project.
+> It should be treated like any other secret credential.
+> Specifically, it should **never** be checked into source control. :rotating_light:
