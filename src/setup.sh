@@ -460,7 +460,8 @@ else
 		CHOCPACKAGES=" \
 			curl \
 			python \
-			azure-cli \
+			terraform \
+			gcloudsdk \
 			kubernetes-cli \
 			kubernetes-helm \
 			jq \
