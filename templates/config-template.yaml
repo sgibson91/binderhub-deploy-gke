@@ -1,5 +1,5 @@
 config:
   BinderHub:
-    hub_url: https://{hubIpAddr}
+    hub_url: http://{hubIpAddr}
     image_prefix: {dockerId}/{imagePrefix}-
     use_registry: true
