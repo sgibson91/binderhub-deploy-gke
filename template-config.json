@@ -1,0 +1,23 @@
+{
+    "binderhub": {
+        "name": "",
+        "image_prefix": "",
+        "version": ""
+    },
+    "docker": {
+        "org": null,
+        "username": "",
+        "password": ""
+    },
+    "gcp": {
+        "email_account": "",
+        "project_id": "",
+        "credentials_file": "",
+        "region": "",
+        "zone": ""
+    },
+    "gke": {
+        "node_count": 1,
+        "machine_type": ""
+    }
+}
