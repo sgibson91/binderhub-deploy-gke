@@ -313,10 +313,6 @@ if [[ -n $CONTAINER_MODE ]]; then
 	gsutil cp "${DIR}"/*.log gs://"${BUCKET_NAME}"
 	echo "--> Uploading yaml files"
 	gsutil cp "${DIR}"/*.yaml gs://"${BUCKET_NAME}"
-	echo "--> Getting and uploading SSH keys"
-	cp ~/.ssh/id_rsa "${DIR}/id_rsa_${BINDERHUB_NAME}"
-	cp ~/.ssh/id_rsa.pub "${DIR}/id_rsa_${BINDERHUB_NAME}.pub"
-	gsutil cp "${DIR}"/id* gs://"${BUCKET_NAME}"
 	echo "--> Uploading terraform state file"
 	gsutil cp "${DIR}"/terraform/terraform.tfstate gs://"${BUCKET_NAME}"
 fi
