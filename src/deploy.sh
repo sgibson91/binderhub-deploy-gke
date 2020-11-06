@@ -296,3 +296,24 @@ while [ "${BINDER_IP}" = '<pending>' ] || [ "${BINDER_IP}" = "" ]; do
 done
 
 echo "--> BinderHub successfully deployed!"
+
+if [[ -n $CONTAINER_MODE ]]; then
+	# Finally, save outputs to a storage bucket
+	#
+	# Create a storage bucket
+	echo "--> Creating a storage bucket"
+	BUCKET_NAME="$(echo "${BINDERHUB_NAME}" | tr -cd '[:alnum:]' | tr '[:upper:]' '[:lower:]' | cut -c -20)$(openssl rand -hex 2)"
+	gsutil mb -b on -p "${GCP_PROJECT_ID}" -l "${GCP_REGION}" gs://"${BUCKET_NAME}"
+
+	# Upload the files
+	echo "--> Uploading log files"
+	gsutil cp "${DIR}"/*.log gs://"${BUCKET_NAME}"
+	echo "--> Uploading yaml files"
+	gsutil cp "${DIR}"/*.yaml gs://"${BUCKET_NAME}"
+	echo "--> Getting and uploading SSH keys"
+	cp ~/.ssh/id_rsa "${DIR}/id_rsa_${BINDERHUB_NAME}"
+	cp ~/.ssh/id_rsa.pub "${DIR}/id_rsa_${BINDERHUB_NAME}.pub"
+	gsutil cp "${DIR}"/id* gs://"${BUCKET_NAME}"
+	echo "--> Uploading terraform state file"
+	gsutil cp "${DIR}"/terraform/terraform.tfstate gs://"${BUCKET_NAME}"
+fi
