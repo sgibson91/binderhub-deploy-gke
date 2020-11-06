@@ -27,6 +27,15 @@
         "test",
         "tool"
       ]
+    },
+    {
+      "login": "minrk",
+      "name": "Min RK",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/151929?v=4",
+      "profile": "https://twitter.com/minrk",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
