@@ -175,7 +175,7 @@ terraform apply "gkeplan"
 cd "${DIR}"
 
 # Get cluster credentials
-gcloud container clusters get-credentials "${GKE_CLUSTER_NAME}" --zone "${GCP_ZONE}" | tee "${DIR}"/gke-creds.log
+gcloud container clusters get-credentials "${GKE_CLUSTER_NAME}" --zone "${GCP_ZONE}" --project "${GCP_PROJECT_ID}" | tee "${DIR}"/gke-creds.log
 
 # Check nodes are ready
 nodeCount="$(kubectl get nodes | awk '{print $2}' | grep -c Ready)"
