@@ -23,7 +23,8 @@
         "infra",
         "maintenance",
         "platform",
-        "projectManagement"
+        "projectManagement",
+        "test"
       ]
     }
   ],
