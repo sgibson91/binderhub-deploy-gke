@@ -25,9 +25,11 @@ If you are building a BinderHub as a service for an organisation, your instituti
   - [:information_source: `info.sh`](#ℹinformation_source-infosh)
   - [:arrow_up: `upgrade.sh`](#️arrow_up-upgradesh)
   - [:boom: `teardown.sh`](#boom-teardownsh)
- - [:house_with_garden: Running the Container Locally](#house_with_garden-running-the-container-locally)
-- [:package: Retrieving Deployment Output](#package-retrieving-deployment-output)
-- [:unlock: Accessing your BinderHub after Deployment](#unlock-accessing-your-binderhub-after-deployment)
+- [:house_with_garden: Running the Container Locally](#house_with_garden-running-the-container-locally)
+  - [:arrow_up: Updating your Service Account](#arrow_up-updating-your-service-account)
+  - [:whale: Running the Container](#whale-running-the-container)
+  - [:package: Retrieving Deployment Output](#package-retrieving-deployment-output)
+  - [:unlock: Accessing your BinderHub after Deployment](#unlock-accessing-your-binderhub-after-deployment)
 - [:art: Customising your BinderHub Deployment](#art-customising-your-binderhub-deployment)
 
 ---
@@ -167,6 +169,18 @@ Another way to deploy BinderHub to Google Cloud would be to pull the Docker imag
 You will need the Docker CLI installed.
 Installation instructions can be found [here](https://docs.docker.com/v17.12/install/).
 
+### :arrow_up: Updating your Service Account
+
+To deploy the BinderHub without your local authentication details, we need to grant an extra role to the Service Account you created in ["Create a Service Account key"](#key-create-a-service-account-key).
+
+1. On the [IAM page](https://console.cloud.google.com/iam-admin/iam) of the Google Cloud console, edit the Service Account you created.
+   Do this by selecting the pencil icon to the right of the account.
+2. Select "+ Add Another Role"
+3. Search for and add the "Kubernetes Engine Admin" role
+4. Click "Save"
+
+### :whale: Running the Container
+
 First, pull the `binderhub-setup-gke` image.
 
 ```bash
@@ -203,7 +217,7 @@ docker run \
 The output will be printed to your terminal and the files will be pushed to a storage bucket.
 See the [Retrieving Deployment Output](#package-retrieving-deployment-output) section for how to return these files.
 
-## :package: Retrieving Deployment Output
+### :package: Retrieving Deployment Output
 
 When BinderHub is deployed using a local container, output logs, YAML files, and the terraform state file are pushed to a Google storage bucket to preserve them once the container exits.
 The storage bucket is created in the same project as the Kubernetes cluster.
@@ -232,7 +246,7 @@ mv ${STORAGE_BUCKET_NAME}/terraform.tfstate ./terraform
 
 > For full documentation, see ["Cloud Storage: Downloading Objects"](https://cloud.google.com/storage/docs/downloading-objects#gsutil).
 
-## :unlock: Accessing your BinderHub after Deployment
+### :unlock: Accessing your BinderHub after Deployment
 
 Once the deployment has succeeded and you've downloaded the log files, visit the IP address of your Binder page to test it's working.
 
