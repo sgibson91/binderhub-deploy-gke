@@ -1,6 +1,6 @@
 # Automatically deploy a BinderHub to Google Cloud
 
-[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/sgibson91/binderhub-setup-gke)](https://hub.docker.com/repository/docker/sgibson91/binderhub-setup-gke)
+[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/sgibson91/binderhub-setup-gke)](https://hub.docker.com/repository/docker/sgibson91/binderhub-setup-gke) ![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Check%20Setup/badge.svg?branch=main) ![Run shellcheck and shfmt](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Run%20shellcheck%20and%20shfmt/badge.svg?branch=main) ![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Lint%20YAML%20templates/badge.svg?branch=main) ![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Validate%20terraform%20files/badge.svg?branch=main)
 
 [BinderHub](https://binderhub.readthedocs.io/en/latest/index.html) is a cloud-based, multi-server technology used for hosting repoducible computing environments and interactive Jupyter Notebooks built from code repositories.
 
