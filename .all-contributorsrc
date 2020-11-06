@@ -1,0 +1,44 @@
+{
+  "projectName": "binderhub-deploy-gke",
+  "projectOwner": "alan-turing-institute",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 70,
+  "commit": true,
+  "commitConvention": "gitmoji",
+  "contributors": [
+    {
+      "login": "sgibson91",
+      "name": "Sarah Gibson",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/44771837?v=4",
+      "profile": "https://sgibson91.github.io/",
+      "contributions": [
+        "bug",
+        "code",
+        "doc",
+        "ideas",
+        "infra",
+        "maintenance",
+        "platform",
+        "projectManagement",
+        "test",
+        "tool"
+      ]
+    },
+    {
+      "login": "minrk",
+      "name": "Min RK",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/151929?v=4",
+      "profile": "https://twitter.com/minrk",
+      "contributions": [
+        "code",
+        "ideas",
+        "tool"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

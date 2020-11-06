@@ -1,6 +1,8 @@
 # Automatically deploy a BinderHub to Google Cloud
 
-[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/sgibson91/binderhub-setup-gke)](https://hub.docker.com/repository/docker/sgibson91/binderhub-setup-gke) ![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Check%20Setup/badge.svg?branch=main) ![Run shellcheck and shfmt](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Run%20shellcheck%20and%20shfmt/badge.svg?branch=main) ![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Lint%20YAML%20templates/badge.svg?branch=main) ![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Validate%20terraform%20files/badge.svg?branch=main)
+[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/sgibson91/binderhub-setup-gke)](https://hub.docker.com/repository/docker/sgibson91/binderhub-setup-gke) ![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Check%20Setup/badge.svg?branch=main) ![Run shellcheck and shfmt](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Run%20shellcheck%20and%20shfmt/badge.svg?branch=main) ![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Lint%20YAML%20templates/badge.svg?branch=main) ![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Validate%20terraform%20files/badge.svg?branch=main) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [BinderHub](https://binderhub.readthedocs.io/en/latest/index.html) is a cloud-based, multi-server technology used for hosting repoducible computing environments and interactive Jupyter Notebooks built from code repositories.
 
@@ -31,6 +33,7 @@ If you are building a BinderHub as a service for an organisation, your instituti
   - [:package: Retrieving Deployment Output](#package-retrieving-deployment-output)
   - [:unlock: Accessing your BinderHub after Deployment](#unlock-accessing-your-binderhub-after-deployment)
 - [:art: Customising your BinderHub Deployment](#art-customising-your-binderhub-deployment)
+- [:sparkles: Contributors](#sparkles-contributors)
 
 ---
 
@@ -266,3 +269,24 @@ The Helm Chart can be upgraded by running [`upgrade.sh`](./upgrade.sh) (make sur
 The Jupyter guide to customising the underlying JupyterHub can be found [here](https://zero-to-jupyterhub.readthedocs.io/en/latest/extending-jupyterhub.html).
 
 The BinderHub guide for changing the landing page logo can be found [here](https://binderhub.readthedocs.io/en/latest/customizing.html#template-customization).
+
+## :sparkles: Contributors
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://sgibson91.github.io/"><img src="https://avatars2.githubusercontent.com/u/44771837?v=4?s=70" width="70px;" alt=""/><br /><sub><b>Sarah Gibson</b></sub></a><br /><a href="https://github.com/alan-turing-institute/binderhub-deploy-gke/issues?q=author%3Asgibson91" title="Bug reports">🐛</a> <a href="https://github.com/alan-turing-institute/binderhub-deploy-gke/commits?author=sgibson91" title="Code">💻</a> <a href="https://github.com/alan-turing-institute/binderhub-deploy-gke/commits?author=sgibson91" title="Documentation">📖</a> <a href="#ideas-sgibson91" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-sgibson91" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-sgibson91" title="Maintenance">🚧</a> <a href="#platform-sgibson91" title="Packaging/porting to new platform">📦</a> <a href="#projectManagement-sgibson91" title="Project Management">📆</a> <a href="https://github.com/alan-turing-institute/binderhub-deploy-gke/commits?author=sgibson91" title="Tests">⚠️</a> <a href="#tool-sgibson91" title="Tools">🔧</a></td>
+    <td align="center"><a href="https://twitter.com/minrk"><img src="https://avatars1.githubusercontent.com/u/151929?v=4?s=70" width="70px;" alt=""/><br /><sub><b>Min RK</b></sub></a><br /><a href="https://github.com/alan-turing-institute/binderhub-deploy-gke/commits?author=minrk" title="Code">💻</a> <a href="#ideas-minrk" title="Ideas, Planning, & Feedback">🤔</a> <a href="#tool-minrk" title="Tools">🔧</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
