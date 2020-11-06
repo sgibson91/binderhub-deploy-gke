@@ -310,9 +310,9 @@ if [[ -n $CONTAINER_MODE ]]; then
 
 	# Upload the files
 	echo "--> Uploading log files"
-	gsutil cp "${DIR}"/*.log gs://"${BUCKET_NAME}"
+	gsutil -m cp "${DIR}"/*.log gs://"${BUCKET_NAME}"
 	echo "--> Uploading yaml files"
-	gsutil cp "${DIR}"/*.yaml gs://"${BUCKET_NAME}"
+	gsutil -m cp "${DIR}"/*.yaml gs://"${BUCKET_NAME}"
 	echo "--> Uploading terraform state file"
 	gsutil cp "${DIR}"/terraform/terraform.tfstate gs://"${BUCKET_NAME}"
 fi
