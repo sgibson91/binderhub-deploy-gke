@@ -1,6 +1,6 @@
 # Automatically deploy a BinderHub to Google Cloud
 
-[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/sgibson91/binderhub-setup-gke)](https://hub.docker.com/repository/docker/sgibson91/binderhub-setup-gke)
 
 [BinderHub](https://binderhub.readthedocs.io/en/latest/index.html) is a cloud-based, multi-server technology used for hosting repoducible computing environments and interactive Jupyter Notebooks built from code repositories.
 
@@ -25,7 +25,7 @@ If you are building a BinderHub as a service for an organisation, your instituti
   - [:information_source: `info.sh`](#ℹinformation_source-infosh)
   - [:arrow_up: `upgrade.sh`](#️arrow_up-upgradesh)
   - [:boom: `teardown.sh`](#boom-teardownsh)
-- [:house_with_garden: Running the Container Locally](#house_with_garden-running-the-container-locally)
+ - [:house_with_garden: Running the Container Locally](#house_with_garden-running-the-container-locally)
 - [:package: Retrieving Deployment Output](#package-retrieving-deployment-output)
 - [:unlock: Accessing your BinderHub after Deployment](#unlock-accessing-your-binderhub-after-deployment)
 - [:art: Customising your BinderHub Deployment](#art-customising-your-binderhub-deployment)
