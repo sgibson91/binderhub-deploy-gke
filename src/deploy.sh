@@ -62,8 +62,11 @@ if [[ -n $CONTAINER_MODE ]]; then
 		IMAGE_PREFIX: ${IMAGE_PREFIX}
 		" | tee "${DIR}"/read-config.log
 
+	# Set variable for path to credentials file
+	GCP_PROJECT_CREDS="${DIR}"/key_file.json
+
 	# Authenticate with gcloud
-	gcloud auth activate-service-account --key-file "${DIR}"/key_file.json
+	gcloud auth activate-service-account --key-file "${GCP_PROJECT_CREDS}"
 
 else
 	echo "--> Reading configuration from ${configFile}"
