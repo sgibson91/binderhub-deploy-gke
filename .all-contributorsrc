@@ -24,7 +24,8 @@
         "maintenance",
         "platform",
         "projectManagement",
-        "test"
+        "test",
+        "tool"
       ]
     }
   ],
