@@ -25,6 +25,9 @@ If you are building a BinderHub as a service for an organisation, your instituti
   - [:information_source: `info.sh`](#ℹinformation_source-infosh)
   - [:arrow_up: `upgrade.sh`](#️arrow_up-upgradesh)
   - [:boom: `teardown.sh`](#boom-teardownsh)
+- [:house_with_garden: Running the Container Locally](#house_with_garden-running-the-container-locally)
+- [:package: Retrieving Deployment Output](#package-retrieving-deployment-output)
+- [:unlock: Accessing your BinderHub after Deployment](#unlock-accessing-your-binderhub-after-deployment)
 - [:art: Customising your BinderHub Deployment](#art-customising-your-binderhub-deployment)
 
 ---
@@ -156,6 +159,90 @@ It reads the BinderHub name and Helm Chart version from `config.json`.
 This script will run the `terraform destroy -auto-approve` command to destroy all deployed resources.
 It will read the `terraform.tfstate` (which will be git-ignored) file under `terraform` directory.
 The user should check the [Google Cloud Console](https://console.cloud.google.com/home/dashboard) to verify the resources have been deleted.
+
+## :house_with_garden: Running the Container Locally
+
+Another way to deploy BinderHub to Google Cloud would be to pull the Docker image and run it directly, parsing the values you would have entered in `config.json` as environment variables.
+
+You will need the Docker CLI installed.
+Installation instructions can be found [here](https://docs.docker.com/v17.12/install/).
+
+First, pull the `binderhub-setup-gke` image.
+
+```bash
+docker pull sgibson91/binderhub-setup-gke:<TAG>
+```
+
+where `<TAG>` is your chosen image tag.
+
+A list of availabe tags can be found [here](https://cloud.docker.com/repository/docker/sgibson91/binderhub-setup-gke/tags).
+It is recommended to use the most recent version number.
+The `latest` tag is the most recent build from the default branch and may be subject fluctuations.
+
+Then, run the container with the following arguments, replacing the `<>` fields as necessary:
+
+```bash
+docker run \
+-e "CONTAINER_MODE=true" \  # Required
+-e "BINDERHUB_NAME=<Chosen BinderHub Name>" \  # Required
+-e "BINDERHUB_VERSION=<Chosen BinderHub Version>" \  # Required
+-d "DOCKER_ORG=<Docker Hub Organisation>" \  # Optional
+-e "DOCKER_USERNAME=<DOCKER ID>" \  # Required
+-e "DOCKER_PASSWORD=<Docker Password>" \  # Required
+-e "GCP_ACCOUNT_EMAIL=<Google Email Account>" \  # Required
+-e "GCP_PROJECT_ID=<Google Project ID>" \  # Required
+-e "GCP_REGION=<Google Cloud Region>" \  # Required
+-e "GCP_ZONE=<Google Cloud Zone>" \  # Required
+-e "GKE_NODE_COUNT=3" \  # Required
+-e "GKE_MACHINE_TYPE=n1-standard-2" \  # Required
+-e "IMAGE_PREFIX=binder-dev" \  # Required
+-v <Path to Service Account key file>:/app/key_file.json \  # Required
+-it sgibson91/binderhub-setup-gke:<TAG>
+```
+
+The output will be printed to your terminal and the files will be pushed to a storage bucket.
+See the [Retrieving Deployment Output](#package-retrieving-deployment-output) section for how to return these files.
+
+## :package: Retrieving Deployment Output
+
+When BinderHub is deployed using a local container, output logs, YAML files, and the terraform state file are pushed to a Google storage bucket to preserve them once the container exits.
+The storage bucket is created in the same project as the Kubernetes cluster.
+
+The storage bucket name is derived from the name you gave to your BinderHub instance, but may be modified and/or have a random seed appended.
+The Google Cloud CLI can be used to find the bucket and download it's contents.
+It can be installed by running the [`setup.sh`](./src/setup.sh) script.
+
+To find the storage bucket name, run the following command.
+
+```bash
+gsutil ls
+```
+
+To download all files from the bucket:
+
+```bash
+gsutil -m cp -r gs://${STORAGE_BUCKET_NAME} ./
+```
+
+**Make sure the terraform state file is moved to the terraform folder!**
+
+```bash
+mv ${STORAGE_BUCKET_NAME}/terraform.tfstate ./terraform
+```
+
+> For full documentation, see ["Cloud Storage: Downloading Objects"](https://cloud.google.com/storage/docs/downloading-objects#gsutil).
+
+## :unlock: Accessing your BinderHub after Deployment
+
+Once the deployment has succeeded and you've downloaded the log files, visit the IP address of your Binder page to test it's working.
+
+The Binder IP address can be found by running the following:
+
+```bash
+cat binder-ip.log
+```
+
+A good repository to test your BinderHub with is [binder-examples/requirements](https://github.com/binder-examples/requirements)
 
 ## :art: Customising your BinderHub Deployment
 
