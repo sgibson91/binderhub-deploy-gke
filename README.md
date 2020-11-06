@@ -1,7 +1,7 @@
 # Automatically deploy a BinderHub to Google Cloud
 
 [![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/sgibson91/binderhub-setup-gke)](https://hub.docker.com/repository/docker/sgibson91/binderhub-setup-gke) ![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Check%20Setup/badge.svg?branch=main) ![Run shellcheck and shfmt](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Run%20shellcheck%20and%20shfmt/badge.svg?branch=main) ![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Lint%20YAML%20templates/badge.svg?branch=main) ![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Validate%20terraform%20files/badge.svg?branch=main) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-0-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [BinderHub](https://binderhub.readthedocs.io/en/latest/index.html) is a cloud-based, multi-server technology used for hosting repoducible computing environments and interactive Jupyter Notebooks built from code repositories.
@@ -277,8 +277,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://sgibson91.github.io/"><img src="https://avatars2.githubusercontent.com/u/44771837?v=4?s=70" width="70px;" alt=""/><br /><sub><b>Sarah Gibson</b></sub></a><br /><a href="https://github.com/alan-turing-institute/binderhub-deploy-gke/issues?q=author%3Asgibson91" title="Bug reports">🐛</a></td>
+  </tr>
+</table>
+
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
