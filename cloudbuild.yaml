@@ -1,0 +1,28 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'run',
+    '-e', 'CONTAINER_MODE=true',
+    '-e', 'BINDERHUB_NAME=${_BINDERHUB_NAME}',
+    '-e', 'BINDERHUB_VERSION=${_BINDERHUB_VERSION}',
+    '-e', 'DOCKER_ORG=${_DOCKER_ORG}',
+    '-e', 'DOCKER_USERNAME=${_DOCKER_USERNAME}',
+    '-e', 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}',
+    '-e', 'GCP_ACCOUNT_EMAIL=${_GCP_ACCOUNT_EMAIL}',
+    '-e', 'GCP_PROJECT_ID=${PROJECT_ID}',
+    '-e', 'GCP_REGION=${_GCP_REGION}',
+    '-e', 'GCP_ZONE=${_GCP_ZONE}',
+    '-e', 'GKE_NODE_COUNT=${_GKE_NODE_COUNT}',
+    '-e', 'GKE_MACHINE_TYPE=${_GKE_MACHINE_TYPE}',
+    '-e', 'IMAGE_PREFIX=${_IMAGE_PREFIX}',
+    '-v', '${_APP_KEY_PATH}:/app/key_file.json',
+    '-i', 'registry.hub.docker.com/sgibson91/binderhub-setup-gke'
+  ]
+substitutions:
+  _GCP_REGION: 'us-central1'
+  _GCP_ZONE: 'us-central1-a'
+  _GKE_NODE_COUNT: '3'
+  _GKE_MACHINE_TYPE: 'n1-standard-2'
+timeout: 1800s
+options:
+  logStreamingOption: STREAM_ON
