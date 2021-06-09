@@ -45,7 +45,7 @@ if [[ -n $CONTAINER_MODE ]]; then
 	done
 
 	# Check if DOCKER_ORG is set to null. Return empty string if true.
-	if [ "x${DOCKER_ORG}" == 'xnull' ]; then DOCKER_ORG=""; fi
+	if [ "${DOCKER_ORG}" == 'null' ]; then DOCKER_ORG=""; fi
 
 	# Print configuration
 	echo "--> Configuration to deploy:
@@ -99,7 +99,7 @@ else
 		IMAGE_PREFIX \
 		"
 	for required_var in $REQUIRED_VARS; do
-		if [ -z "${!required_var}" ] || [ "x${!required_var}" == 'xnull' ]; then
+		if [ -z "${!required_var}" ] || [ "${!required_var}" == 'null' ]; then
 			echo "--> ${required_var} must be set for deployment" >&2
 			exit 1
 		fi
@@ -110,9 +110,9 @@ else
 	# possibly due to an invalid JSON file, they will be returned as a
 	# zero-length string -- this is attempting to make the 'not set'
 	# value the same in either case.
-	if [ "x${DOCKER_ORG}" == 'xnull' ]; then DOCKER_ORG=''; fi
-	if [ "x${DOCKER_USERNAME}" == 'xnull' ]; then DOCKER_USERNAME=''; fi
-	if [ "x${DOCKER_PASSWORD}" == 'xnull' ]; then DOCKER_PASSWORD=''; fi
+	if [ "${DOCKER_ORG}" == 'null' ]; then DOCKER_ORG=''; fi
+	if [ "${DOCKER_USERNAME}" == 'null' ]; then DOCKER_USERNAME=''; fi
+	if [ "${DOCKER_PASSWORD}" == 'null' ]; then DOCKER_PASSWORD=''; fi
 
 	# Normalise region, zone and machine_type to remove spaces and have lowercase
 	GCP_REGION=$(echo "${GCP_REGION//[[:blank:]]/}" | tr "[:upper:]" "[:lower:]")
