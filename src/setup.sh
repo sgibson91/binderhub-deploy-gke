@@ -377,9 +377,9 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 			fi
 		done
 		for package in $BREWCASKS; do
-			if ! brew cask ls --versions "$package" >/dev/null; then
+			if ! brew ls --cask --versions "$package" >/dev/null; then
 				echo "--> Brew installing $package"
-				brew cask install "$package" || {
+				brew install --cask "$package" || {
 					echo >&2 "--> $package install failed; please install manually and re-run this script."
 					exit 1
 				}
