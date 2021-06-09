@@ -1,6 +1,6 @@
 FROM google/cloud-sdk:317.0.0-slim
 
-RUN apt install unzip && \
+RUN apt-get update && apt install unzip && \
       # Install kubectl
       curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
       chmod +x ./kubectl && \
