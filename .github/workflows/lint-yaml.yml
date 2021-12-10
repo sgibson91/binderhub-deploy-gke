@@ -2,8 +2,13 @@ name: Lint YAML templates
 
 on:
   push:
-   paths:
-     - "templates/*"
+    paths:
+      - "**/*.yaml"
+      - "**/*.yml"
+  pull_request:
+    paths:
+      - "**/*.yaml"
+      - "**/*.yml"
 
 jobs:
   lint-yaml:
