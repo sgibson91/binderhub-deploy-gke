@@ -1,6 +1,11 @@
 # Automatically deploy a BinderHub to Google Cloud
 
-[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Build and Push Docker image](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml) ![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Check%20Setup/badge.svg?branch=main) ![Run shellcheck and shfmt](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Run%20shellcheck%20and%20shfmt/badge.svg?branch=main) ![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Lint%20YAML%20templates/badge.svg?branch=main) ![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Validate%20terraform%20files/badge.svg?branch=main) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Build and Push Docker image](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml)
+[![Lint Dockerfile](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-dockerfile.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-dockerfile.yml)
+[![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/check-setup.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/check-setup.yml)
+[![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-yaml.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-yaml.yml)
+[![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-terraform.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-terraform.yml)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
