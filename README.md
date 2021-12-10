@@ -1,6 +1,11 @@
 # Automatically deploy a BinderHub to Google Cloud
 
-[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Build and Push Docker image](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml) ![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Check%20Setup/badge.svg?branch=main) ![Run shellcheck and shfmt](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Run%20shellcheck%20and%20shfmt/badge.svg?branch=main) ![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Lint%20YAML%20templates/badge.svg?branch=main) ![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/workflows/Validate%20terraform%20files/badge.svg?branch=main) <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Build and Push Docker image](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/docker-build.yml)
+[![Lint Dockerfile](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-dockerfile.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-dockerfile.yml)
+[![Check Setup](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/check-setup.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/check-setup.yml)
+[![Lint YAML templates](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-yaml.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-yaml.yml)
+[![Validate terraform files](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-terraform.yml/badge.svg)](https://github.com/alan-turing-institute/binderhub-deploy-gke/actions/workflows/lint-terraform.yml)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
@@ -8,7 +13,7 @@
 
 This repository contains a set of scripts to automatically deploy a BinderHub onto [Google Cloud](https://cloud.google.com/) and connect a [Docker Hub](https://hub.docker.com/) account/organisation, so that you can host your own [Binder](https://mybinder.readthedocs.io/en/latest/) service.
 
-This repository is based on the following set of deployment scripts for Google Cloud: [nicain/binder-deploy](https://github.com/nicain/binder-deploy) and the "Deploy to Azure" rpo [alan-turing-institute/binderhub-deploy](https://github.com/alan-turing-institute/binderhub-deploy).
+This repository is based on the "Deploy to Azure" repo [alan-turing-institute/binderhub-deploy](https://github.com/alan-turing-institute/binderhub-deploy).
 
 You will require a Google Cloud account and project.
 A Free Trial project can be obtained [here](https://cloud.google.com/free/).
