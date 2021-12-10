@@ -57,6 +57,7 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		fi
 		if ! command -v terraform >/dev/null 2>&1; then
 			echo "--> Attempting to install Terraform CLI with deb packages"
+			${sudo_command} apt-get update && ${sudo_command} apt-get install gnupg software-properties-common
 			curl -fsSL https://apt.releases.hashicorp.com/gpg | ${sudo_command} apt-key add -
 			${sudo_command} apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 			# shellcheck disable=SC2015
@@ -246,8 +247,8 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 		fi
 		echo "--> Attempting to install terraform with curl"
 		if ! command -v terraform >/dev/null 2>&1; then
-			curl -LO https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_arm64.zip
-			unzip terraform_0.13.5_linux_arm64.zip
+			curl -LO https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_linux_arm64.zip
+			unzip terraform_1.1.0_linux_arm64.zip
 			${sudo_command} mv terraform /usr/local/bin/
 			terraform -help || {
 				echo >&2 "--> terraform install failed; please install manually and re-run this script."
@@ -303,8 +304,8 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 		fi
 		echo "--> Attempting to install terraform with curl"
 		if ! command -v terraform >/dev/null 2>&1; then
-			curl -LO https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_arm64.zip
-			unzip terraform_0.13.5_linux_arm64.zip
+			curl -LO https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_linux_arm64.zip
+			unzip terraform_1.1.0_linux_arm64.zip
 			${sudo_command} mv terraform /usr/local/bin/
 			terraform -help || {
 				echo >&2 "--> terraform install failed; please install manually and re-run this script."
@@ -443,8 +444,8 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 		fi
 		echo "--> Attempting to install terraform with curl"
 		if ! command -v terraform >/dev/null 2>&1; then
-			curl -LO https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_arm64.zip
-			unzip terraform_0.13.5_linux_arm64.zip
+			curl -LO https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_linux_arm64.zip
+			unzip terraform_1.1.0_linux_arm64.zip
 			${sudo_command} mv terraform /usr/local/bin/
 			terraform -help || {
 				echo >&2 "--> terraform install failed; please install manually and re-run this script."
