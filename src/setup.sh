@@ -32,9 +32,9 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		done
 		if ! command -v gcloud >/dev/null 2>&1; then
 			echo "--> Attempting to install Google Cloud SDK with deb packages"
-			echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | ${suod_command} tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+			echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | ${sudo_command} tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 			${sudo_command} apt-get -y install apt-transport-https ca-certificates gnupg
-			curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | ${suod_command} apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+			curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | ${sudo_command} apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 			# shellcheck disable=SC2015
 			${sudo_command} apt-get update && ${sudo_command} apt-get -y install google-cloud-sdk || {
 				echo >&2 "--> Google Cloud SDK install failed; please install manually and re-run this script."
@@ -342,7 +342,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 		exit 1
 	}
 	echo "--> Helm doesn't have a system package; attempting to install with curl"
-	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
+	curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >get_helm.sh
 	chmod 700 get_helm.sh
 	./get_helm.sh || {
 		echo >&2 "--> helm install failed; please install manually and re-run this script."
@@ -435,7 +435,7 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 		fi
 		echo "--> Attempting to install helm with curl"
 		if ! command -v helm >/dev/null 2>&1; then
-			curl -L https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
+			curl -L https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >get_helm.sh
 			chmod 700 get_helm.sh
 			./get_helm.sh || {
 				echo >&2 "--> helm install failed; please install manually and re-run this script."
