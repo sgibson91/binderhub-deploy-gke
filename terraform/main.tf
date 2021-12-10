@@ -1,15 +1,15 @@
 terraform {
-    required_version = ">= 0.12"
+    required_version = ">= 0.13"
 
     required_providers {
         google = {
             source  = "hashicorp/google"
+            version = "4.3.0"
         }
     }
 }
 
 provider "google" {
-    version     = "3.46.0"
     credentials = file(var.credentials_file)
     project     = var.project_id
     region      = var.region
@@ -27,9 +27,6 @@ resource "google_container_cluster" "primary" {
     subnetwork               = google_compute_subnetwork.subnet.name
 
     master_auth {
-        username = ""
-        password = ""
-
         client_certificate_config {
             issue_client_certificate = true
         }
