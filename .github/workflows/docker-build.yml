@@ -10,10 +10,6 @@ on:
     branches:
       - main
 
-defaults:
-  run:
-    shell: bash
-
 env:
   DOCKERHUB_USERNAME: "sgibson91"
   IMAGE_NAME: "binderhub-setup-gke"
@@ -23,32 +19,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set Docker image tag
+      - name: Set image tag for Pull Request
+        if: github.event.pull_request
         run: |
+          echo "tag=test-${{ github.head_ref }}-$(openssl rand -hex 2)" >> $GITHUB_ENV
 
-          if [ ${{ github.event_name }} = 'pull_request' ]; then
-            echo "tag=test-${{ github.head_ref }}-$(openssl rand -hex 2)" >> $GITHUB_ENV
-          else
+      - name: Set image tag for push to main branch
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/main')
+        run: |
+          echo "tag=latest" >> $GITHUB_ENV
 
-            GIT_REF=$(echo ${{ github.ref }} | awk -F'/' '{print $3}')
-
-            if [ $GIT_REF = 'main' ]; then
-              echo "tag=latest" >> $GITHUB_ENV
-            elif [[ $GIT_REF =~ (?<=v)[0-9]*\.[0-9]*\.[0-9]* ]]; then
-              NEW_REF=$(echo $GIT_REF | sed 's/v//')
-              echo "tag=$NEW_REF" >> $GITHUB_ENV
-            fi
-
-          fi
+      - name: Set image tag for a tag push
+        if: (github.event_name == 'push') && contains(github.ref, 'tags')
+        run: |
+          echo "tag=$( date -u '+%Y.%m.%d' )" >> $GITHUB_ENV
 
       - name: Confirm Docker image tag
         run: echo "Tag = ${{ env.tag }}"
 
-      - name: Build and push
-        if: github.event_name == 'pull_request'
-        uses: docker/build-push-action@v2
-        with:
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.tag }}
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Login to DockerHub
         if: github.event_name == 'push'
@@ -61,5 +51,5 @@ jobs:
         if: github.event_name == 'push'
         uses: docker/build-push-action@v2
         with:
-          push: true
+          push: ${{ github.event_name == 'push' }}
           tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.tag }}
