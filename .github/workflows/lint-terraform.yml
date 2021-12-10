@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - "terraform/*"
+  pull_request:
+    paths:
+      - "terraform/*"
 
 jobs:
   validate-terraform:
