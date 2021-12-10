@@ -45,9 +45,9 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		fi
 		if ! command -v kubectl >/dev/null 2>&1; then
 			echo "--> Attempting to install kubectl with deb packages"
-			${sudo_command} apt-get update && ${sudo_command} apt-get install -y apt-transport-https
-			curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | ${sudo_command} apt-key add -
-			echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | ${sudo_command} tee -a /etc/apt/sources.list.d/kubernetes.list
+			${sudo_command} apt-get update && ${sudo_command} apt-get install -y apt-transport-https ca-certificates
+			${sudo_command} curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+			echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | ${sudo_command} tee /etc/apt/sources.list.d/kubernetes.list
 			(${sudo_command} apt-get update && ${sudo_command} apt-get install -y kubectl) || {
 				echo >&2 "--> kubectl install failed; please install manually and re-run this script."
 				exit 1
@@ -57,10 +57,10 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		fi
 		if ! command -v terraform >/dev/null 2>&1; then
 			echo "--> Attempting to install Terraform CLI with deb packages"
-			curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+			curl -fsSL https://apt.releases.hashicorp.com/gpg | ${sudo_command} apt-key add -
 			${sudo_command} apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 			# shellcheck disable=SC2015
-			${sudo_command} apt-get update && sudo apt-get install terraform || {
+			${sudo_command} apt-get update && ${sudo_command} apt-get install terraform || {
 				echo >&2 "--> terraform install failed; please install manually and rerun this script."
 				exit 1
 			}
@@ -188,7 +188,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 			echo "--> kubectl already installed"
 		fi
 		if ! command -v terraform >/dev/null 2>&1; then
-			echo "--> Attempting to install kubectl with zypper packages"
+			echo "--> Attempting to install terraform with zypper packages"
 			${sudo_command} zypper addrepo --refresh https://download.opensuse.org/repositories/system:/snappy/openSUSE_Leap_15.2 snappy
 			${sudo_command} zypper --gpg-auto-import-keys refresh
 			${sudo_command} zypper dup --from snappy
@@ -292,7 +292,7 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cl
 		fi
 		echo "--> Attempting to install kubectl with curl"
 		if ! command -v kubectl >/dev/null 2>&1; then
-			curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl || {
+			curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" || {
 				echo >&2 "--> kubectl download failed; please install manually and re-run this script."
 				exit 1
 			}
@@ -423,7 +423,7 @@ elif [[ ${OSTYPE} == 'darwin'* ]]; then
 		fi
 		echo "--> Attempting to install kubectl with curl"
 		if ! command -v kubectl >/dev/null 2>&1; then
-			curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl || {
+			curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" || {
 				echo >&2 "--> kubectl download failed; please install manually and re-run this script."
 				exit 1
 			}
@@ -506,7 +506,7 @@ else
 		fi
 		echo "--> Attempting to install kubectl with curl"
 		if ! command -v kubectl >/dev/null 2>&1; then
-			curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl || {
+			curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" || {
 				echo >&2 "--> kubectl download failed; please install manually and re-run this script."
 				exit 1
 			}
