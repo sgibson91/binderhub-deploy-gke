@@ -32,9 +32,9 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		done
 		if ! command -v gcloud >/dev/null 2>&1; then
 			echo "--> Attempting to install Google Cloud SDK with deb packages"
-			echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | ${sudo_command} tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+			echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | ${suod_command} tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 			${sudo_command} apt-get -y install apt-transport-https ca-certificates gnupg
-			curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | ${sudo_command} apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+			curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | ${suod_command} apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 			# shellcheck disable=SC2015
 			${sudo_command} apt-get update && ${sudo_command} apt-get -y install google-cloud-sdk || {
 				echo >&2 "--> Google Cloud SDK install failed; please install manually and re-run this script."
@@ -57,11 +57,11 @@ if [[ ${OSTYPE} == 'linux'* ]]; then
 		fi
 		if ! command -v terraform >/dev/null 2>&1; then
 			echo "--> Attempting to install Terraform CLI with deb packages"
-			${sudo_command} apt-get update && ${sudo_command} apt-get install gnupg software-properties-common
+			${sudo_command} apt-get update && ${sudo_command} apt-get install -y gnupg software-properties-common
 			curl -fsSL https://apt.releases.hashicorp.com/gpg | ${sudo_command} apt-key add -
 			${sudo_command} apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 			# shellcheck disable=SC2015
-			${sudo_command} apt-get update && ${sudo_command} apt-get install terraform || {
+			${sudo_command} apt-get update && ${sudo_command} apt-get install -y terraform || {
 				echo >&2 "--> terraform install failed; please install manually and rerun this script."
 				exit 1
 			}
