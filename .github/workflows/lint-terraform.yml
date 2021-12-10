@@ -15,13 +15,13 @@ jobs:
 
       - name: Setup Terraform v0.13.5
         uses: hashicorp/setup-terraform@v1.2.1
-        with:
-          terraform_version: 0.13.5
 
       - name: Initialise Terraform
         working-directory: terraform
-        run: terraform init -backend=false
+        run: |
+          terraform init -backend=false
 
       - name: Validate Terraform
         working-directory: terraform
-        run: terraform validate
+        run: |
+          terraform validate
