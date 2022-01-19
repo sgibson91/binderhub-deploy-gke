@@ -5,50 +5,40 @@ on:
     branches:
       - main
     tags:
-      - "*"
+      - "^[0-9]{4}\\.[0-1][0-9]\\.[0-3][0-9]$"
   pull_request:
     branches:
       - main
 
-env:
-  DOCKERHUB_USERNAME: "sgibson91"
-  IMAGE_NAME: "binderhub-setup-gke"
-
 jobs:
   docker-build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Set image tag for Pull Request
+      - name: "Set Docker tag: push to main"
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "DOCKER_TAG=latest" >> $GITHUB_ENV
+
+      - name: "Set Docker tag: push to tag"
+        if: github.event_name == 'push' && contains(github.ref, 'tags')
+        run: |
+          echo "DOCKER_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: "Set Docker tag: pull request"
         if: github.event.pull_request
         run: |
-          echo "tag=test-${{ github.head_ref }}-$(openssl rand -hex 2)" >> $GITHUB_ENV
-
-      - name: Set image tag for push to main branch
-        if: (github.event_name == 'push') && (github.ref == 'refs/heads/main')
-        run: |
-          echo "tag=latest" >> $GITHUB_ENV
-
-      - name: Set image tag for a tag push
-        if: (github.event_name == 'push') && contains(github.ref, 'tags')
-        run: |
-          echo "tag=$( date -u '+%Y.%m.%d' )" >> $GITHUB_ENV
-
-      - name: Confirm Docker image tag
-        run: echo "Tag = ${{ env.tag }}"
-
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
+          echo "DOCKER_TAG=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
 
       - name: Login to DockerHub
-        if: github.event_name == 'push'
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v1
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
+          username: sgibson91
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          push: ${{ github.event_name == 'push' }}
-          tags: ${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.tag }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            sgibson91/${{ github.event.repository.name }}:${{ env.DOCKER_TAG }}
