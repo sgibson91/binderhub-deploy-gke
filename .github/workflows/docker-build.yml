@@ -9,7 +9,6 @@ on:
   pull_request:
     branches:
       - "main"
-      # Ignore
 
 env:
   DOCKERHUB_USERNAME: "sgibson91"
@@ -17,17 +16,16 @@ env:
 
 jobs:
   docker-build:
-    if: contains(github.ref, 'dependabot') == false
     runs-on: ubuntu-latest
 
     steps:
       - name: Set image tag for Pull Request
-        if: github.event.pull_request && contains(github.ref, 'dependabot') == false
+        if: github.event.pull_request && startsWith(github.head_ref, 'dependabot') == false
         run: |
           echo "tag=test-${{ github.head_ref }}-$(openssl rand -hex 2)" >> $GITHUB_ENV
 
       - name: Set image tag for Pull Request opened by dependabot
-        if: github.event.pull_request && contains(github.ref, 'dependabot') == true
+        if: github.event.pull_request && startsWith(github.head_ref, 'dependabot')
         run: |
           echo "tag=test-dependabot-$(openssl rand -hex 2)" >> $GITHUB_ENV
 
