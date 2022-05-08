@@ -43,7 +43,7 @@ jobs:
         run: echo "Tag = ${{ env.tag }}"
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to DockerHub
         if: github.event_name == 'push'
