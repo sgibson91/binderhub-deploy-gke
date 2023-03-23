@@ -1,3 +1,5 @@
+:warning: This repo is no longer maintained, and hence archived :warning:
+
 # Automatically deploy a BinderHub to Google Cloud
 
 [![mit_license_badge](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
